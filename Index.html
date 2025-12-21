@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* ... (Previous Styles Remain the Same) ... */
     :root {
       --bg: #f4f6fb;
       --card: #ffffff;
@@ -22,58 +21,56 @@
 
     body { margin: 0; font-family: "Cairo", system-ui, sans-serif; background: var(--bg); color: var(--text); }
     .container { max-width: 1100px; margin: auto; padding: 32px 20px 60px; }
-    header { text-align: center; margin-bottom: 30px; }
     
-    /* Tabs Style */
+    header { text-align: center; margin-bottom: 30px; }
+    header h1 { margin: 0 0 10px; color: var(--primary); }
+    header p { color: var(--muted); margin: 0; }
+
+    /* Tabs */
     .tabs-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px; background: #fff; padding: 15px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    .tab-btn { background: transparent; border: 2px solid var(--secondary); color: var(--muted); padding: 10px 20px; border-radius: 50px; font-family: "Cairo", sans-serif; font-weight: 700; cursor: pointer; transition: all 0.3s ease; }
+    .tab-btn { background: transparent; border: 2px solid var(--secondary); color: var(--muted); padding: 8px 16px; border-radius: 50px; font-family: "Cairo", sans-serif; font-weight: 700; cursor: pointer; transition: all 0.3s ease; }
     .tab-btn:hover { border-color: var(--primary); color: var(--primary); }
     .tab-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 
-    /* Content & Tables */
+    /* Content */
     .subject-content { display: none; animation: fadeIn 0.4s ease-in-out; }
     .subject-content.active-content { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    
-    .subject-card { background: var(--card); border-radius: var(--radius); margin-bottom: 28px; border: 1px solid var(--border); overflow: hidden; }
-    .card-header { padding: 18px 22px; font-size: 22px; font-weight: 700; color: var(--primary); background: linear-gradient(135deg, var(--secondary), #ffffff); border-bottom: 1px solid var(--border); }
-    
+
+    .subject-card { background: var(--card); border-radius: var(--radius); margin-bottom: 20px; border: 1px solid var(--border); overflow: hidden; }
+    .card-header { padding: 15px 20px; font-size: 20px; font-weight: 700; color: var(--primary); background: linear-gradient(135deg, var(--secondary), #ffffff); border-bottom: 1px solid var(--border); }
+
     details { border-bottom: 1px solid var(--border); }
-    summary { cursor: pointer; padding: 16px 22px; font-weight: 600; background: #fafbff; display: flex; justify-content: space-between; align-items: center; }
+    details:last-child { border-bottom: none; }
+    summary { cursor: pointer; padding: 15px 20px; font-weight: 600; background: #fafbff; display: flex; justify-content: space-between; align-items: center; }
+    summary:hover { background: #f0f4ff; }
     
-    .table-wrapper { padding: 12px; background: #fff; }
-    table { width: 100%; border-collapse: collapse; }
+    /* Table */
+    .table-wrapper { padding: 10px; background: #fff; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 500px; }
     th, td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    
-    /* Column Widths */
     th.chapter-col { width: 25%; text-align: right; color: var(--primary); background-color: #fcfcfc; }
     td.desc-col { text-align: right; }
-    
-    /* STATUS TOGGLE STYLE */
-    th.status-col { width: 150px; text-align: center; color: var(--muted); }
+    th.status-col { width: 120px; text-align: center; color: var(--muted); }
     td.status-cell { text-align: center; }
 
-    /* Custom Checkbox Design */
+    /* Toggle Switch */
     .toggle-checkbox { display: none; }
     .toggle-label {
       display: inline-flex; align-items: center; justify-content: center;
-      padding: 6px 12px; border-radius: 20px; cursor: pointer;
-      background-color: #eee; color: #777; font-size: 14px; font-weight: bold;
-      transition: all 0.3s ease; border: 1px solid #ddd; width: 100px;
+      padding: 6px 0; border-radius: 20px; cursor: pointer;
+      background-color: #eee; color: #777; font-size: 13px; font-weight: bold;
+      transition: all 0.3s ease; border: 1px solid #ddd; width: 90px;
     }
     .toggle-label::after { content: "غير جاهز"; }
-    
-    /* Checked State */
-    .toggle-checkbox:checked + .toggle-label {
-      background-color: var(--success); color: white; border-color: var(--success);
-    }
+    .toggle-checkbox:checked + .toggle-label { background-color: var(--success); color: white; border-color: var(--success); }
     .toggle-checkbox:checked + .toggle-label::after { content: "تم الرفع"; }
 
     @media (max-width: 600px) {
       .tabs-container { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; }
       .tab-btn { white-space: nowrap; flex: 0 0 auto; }
-      th.chapter-col { width: 30%; font-size: 13px; }
-      .toggle-label { padding: 4px 8px; font-size: 12px; width: 70px; }
+      th.chapter-col { width: 30%; font-size: 12px; }
+      .toggle-label { font-size: 11px; width: 70px; }
     }
   </style>
 </head>
@@ -81,55 +78,49 @@
 <body>
 <div class="container">
   <header>
-    <h1>لوحة متابعة المحاضرات</h1>
-    <p>اضغط على الزر عند رفع الأسئلة. سيتم التحديث لدى جميع الأساتذة تلقائياً.</p>
+    <h1>متابعة رفع الأسئلة</h1>
+    <p>نظام المزامنة الفورية للمحاضرات</p>
   </header>
 
   <div class="tabs-container">
     <button class="tab-btn active" onclick="openSubject('chemistry')">الكيمياء</button>
     <button class="tab-btn" onclick="openSubject('biology')">الأحياء</button>
-    </div>
+    <button class="tab-btn" onclick="openSubject('math')">الرياضيات</button>
+    <button class="tab-btn" onclick="openSubject('arabic')">اللغة العربية</button>
+    <button class="tab-btn" onclick="openSubject('physics')">الفيزياء</button>
+    <button class="tab-btn" onclick="openSubject('english')">English</button>
+  </div>
 
   <div id="chemistry" class="subject-content active-content">
     <div class="subject-card">
       <div class="card-header">الكيمياء</div>
       
       <details open>
-        <summary>السادس العلمي</summary>
+        <summary>الصف السادس العلمي (G12)</summary>
         <div class="table-wrapper">
           <table>
-            <thead>
-              <tr>
-                <th class="chapter-col">الفصل</th>
-                <th class="desc-col">المحاضرة</th>
-                <th class="status-col">حالة الأسئلة</th>
-              </tr>
-            </thead>
+            <thead><tr><th class="chapter-col">الفصل</th><th class="desc-col">المحاضرة</th><th class="status-col">الحالة</th></tr></thead>
             <tbody>
-              <tr>
-                <td class="chapter-col">الفصل الرابع</td>
-                <td class="desc-col">محاضرة 6 - التعبير عن الخلية كتابة</td>
-                <td class="status-cell">
-                  <input type="checkbox" id="chem-g12-lec6" class="toggle-checkbox">
-                  <label for="chem-g12-lec6" class="toggle-label"></label>
-                </td>
-              </tr>
-              <tr>
-                <td class="chapter-col">الفصل الرابع</td>
-                <td class="desc-col">محاضرة 7 - حساب جهد الخلية</td>
-                <td class="status-cell">
-                  <input type="checkbox" id="chem-g12-lec7" class="toggle-checkbox">
-                  <label for="chem-g12-lec7" class="toggle-label"></label>
-                </td>
-              </tr>
-              <tr>
-                <td class="chapter-col">الفصل الرابع</td>
-                <td class="desc-col">محاضرة 8 - تحديد تلقائية تفاعل الخلية</td>
-                <td class="status-cell">
-                  <input type="checkbox" id="chem-g12-lec8" class="toggle-checkbox">
-                  <label for="chem-g12-lec8" class="toggle-label"></label>
-                </td>
-              </tr>
+              <tr><td class="chapter-col">الفصل الرابع</td><td class="desc-col">محاضرة 6 - التعبير عن الخلية كتابة</td><td class="status-cell"><input type="checkbox" id="chem-g12-lec6" class="toggle-checkbox"><label for="chem-g12-lec6" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الرابع</td><td class="desc-col">محاضرة 7 - حساب جهد الخلية</td><td class="status-cell"><input type="checkbox" id="chem-g12-lec7" class="toggle-checkbox"><label for="chem-g12-lec7" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الرابع</td><td class="desc-col">محاضرة 8 - تحديد تلقائية تفاعل الخلية</td><td class="status-cell"><input type="checkbox" id="chem-g12-lec8" class="toggle-checkbox"><label for="chem-g12-lec8" class="toggle-label"></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>الصف الثالث المتوسط (G09)</summary>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th class="chapter-col">الفصل</th><th class="desc-col">المحاضرة</th><th class="status-col">الحالة</th></tr></thead>
+            <tbody>
+              <tr><td class="chapter-col">الفصل السادس</td><td class="desc-col">محاضرة 3 - غاز الميثان</td><td class="status-cell"><input type="checkbox" id="chem-g09-lec3" class="toggle-checkbox"><label for="chem-g09-lec3" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السادس</td><td class="desc-col">محاضرة 4 - غاز الإيثيلين</td><td class="status-cell"><input type="checkbox" id="chem-g09-lec4" class="toggle-checkbox"><label for="chem-g09-lec4" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السادس</td><td class="desc-col">محاضرة 5 - غاز الأسيتيلين</td><td class="status-cell"><input type="checkbox" id="chem-g09-lec5" class="toggle-checkbox"><label for="chem-g09-lec5" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السادس</td><td class="desc-col">محاضرة 6 - الكحول الإيثيلي</td><td class="status-cell"><input type="checkbox" id="chem-g09-lec6" class="toggle-checkbox"><label for="chem-g09-lec6" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السادس</td><td class="desc-col">محاضرة 7 - حامض الخليك-البنزين-الفينول</td><td class="status-cell"><input type="checkbox" id="chem-g09-lec7" class="toggle-checkbox"><label for="chem-g09-lec7" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السادس</td><td class="desc-col">محاضرة 8 - حل اسئلة الفصل</td><td class="status-cell"><input type="checkbox" id="chem-g09-lec8" class="toggle-checkbox"><label for="chem-g09-lec8" class="toggle-label"></label></td></tr>
             </tbody>
           </table>
         </div>
@@ -140,34 +131,67 @@
   <div id="biology" class="subject-content">
     <div class="subject-card">
       <div class="card-header">الأحياء</div>
+
       <details open>
-        <summary>السادس العلمي</summary>
+        <summary>الصف السادس العلمي (G12)</summary>
         <div class="table-wrapper">
           <table>
-            <thead>
-              <tr>
-                <th class="chapter-col">الفصل</th>
-                <th class="desc-col">المحاضرة</th>
-                <th class="status-col">حالة الأسئلة</th>
-              </tr>
-            </thead>
+            <thead><tr><th class="chapter-col">الفصل</th><th class="desc-col">المحاضرة</th><th class="status-col">الحالة</th></tr></thead>
             <tbody>
-              <tr>
-                <td class="chapter-col">الفصل الثالث</td>
-                <td class="desc-col">محاضرة 14 - المتك وتكوين حبوب اللقاح</td>
-                <td class="status-cell">
-                  <input type="checkbox" id="bio-g12-lec14" class="toggle-checkbox">
-                  <label for="bio-g12-lec14" class="toggle-label"></label>
-                </td>
-              </tr>
-              <tr>
-                <td class="chapter-col">الفصل الثالث</td>
-                <td class="desc-col">محاضرة 15 - المبيض وتكوين البيوض</td>
-                <td class="status-cell">
-                  <input type="checkbox" id="bio-g12-lec15" class="toggle-checkbox">
-                  <label for="bio-g12-lec15" class="toggle-label"></label>
-                </td>
-              </tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 14 - المتك وتكوين حبوب اللقاح</td><td class="status-cell"><input type="checkbox" id="bio-g12-lec14" class="toggle-checkbox"><label for="bio-g12-lec14" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 15 - المبيض وتكوين البيوض في النباتات الزهرية</td><td class="status-cell"><input type="checkbox" id="bio-g12-lec15" class="toggle-checkbox"><label for="bio-g12-lec15" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 16 - تكوين انبوب اللقاح وعملية الاخصاب وتكوين الجنين</td><td class="status-cell"><input type="checkbox" id="bio-g12-lec16" class="toggle-checkbox"><label for="bio-g12-lec16" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 17 - تكوين البذرة وانواع التلقيح</td><td class="status-cell"><input type="checkbox" id="bio-g12-lec17" class="toggle-checkbox"><label for="bio-g12-lec17" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 18 - تكوين الثمرة</td><td class="status-cell"><input type="checkbox" id="bio-g12-lec18" class="toggle-checkbox"><label for="bio-g12-lec18" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 19 - الاثمار العذري وتركيب الثمرة وانتشار البذور</td><td class="status-cell"><input type="checkbox" id="bio-g12-lec19" class="toggle-checkbox"><label for="bio-g12-lec19" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 20 - التكاثر في الحشرات - الذكري</td><td class="status-cell"><input type="checkbox" id="bio-g12-lec20" class="toggle-checkbox"><label for="bio-g12-lec20" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 21 - التكاثر في الحشرات - الانثوي والاخصاب</td><td class="status-cell"><input type="checkbox" id="bio-g12-lec21" class="toggle-checkbox"><label for="bio-g12-lec21" class="toggle-label"></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>الصف الثالث المتوسط (G09)</summary>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th class="chapter-col">الفصل</th><th class="desc-col">المحاضرة</th><th class="status-col">الحالة</th></tr></thead>
+            <tbody>
+              <tr><td class="chapter-col">Chapter 6</td><td class="desc-col">Full Chapter</td><td class="status-cell"><input type="checkbox" id="bio-g09-ch6" class="toggle-checkbox"><label for="bio-g09-ch6" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">Chapter 7</td><td class="desc-col">Full Chapter</td><td class="status-cell"><input type="checkbox" id="bio-g09-ch7" class="toggle-checkbox"><label for="bio-g09-ch7" class="toggle-label"></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>الصف الثاني المتوسط (G08)</summary>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th class="chapter-col">الفصل</th><th class="desc-col">المحاضرة</th><th class="status-col">الحالة</th></tr></thead>
+            <tbody>
+              <tr><td class="chapter-col">الفصل الرابع</td><td class="desc-col">محاضرة 1 - الطحالب (الدرس الاول ج1)</td><td class="status-cell"><input type="checkbox" id="bio-g08-ch4-lec1" class="toggle-checkbox"><label for="bio-g08-ch4-lec1" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الرابع</td><td class="desc-col">محاضرة 2 - النباتات اللابذرية (الدرس الاول ج2)</td><td class="status-cell"><input type="checkbox" id="bio-g08-ch4-lec2" class="toggle-checkbox"><label for="bio-g08-ch4-lec2" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الرابع</td><td class="desc-col">محاضرة 3 - النباتات البذرية (الدرس الثاني ج1)</td><td class="status-cell"><input type="checkbox" id="bio-g08-ch4-lec3" class="toggle-checkbox"><label for="bio-g08-ch4-lec3" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الرابع</td><td class="desc-col">محاضرة 4 - النباتات البذرية وانواعها</td><td class="status-cell"><input type="checkbox" id="bio-g08-ch4-lec4" class="toggle-checkbox"><label for="bio-g08-ch4-lec4" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الخامس</td><td class="desc-col">محاضرة 1 - اللافقريات - الاسفنجيات + امعائية الجوف</td><td class="status-cell"><input type="checkbox" id="bio-g08-ch5-lec1" class="toggle-checkbox"><label for="bio-g08-ch5-lec1" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الخامس</td><td class="desc-col">محاضرة 2 - اللافقريات - الديدان بثلاث انواعها</td><td class="status-cell"><input type="checkbox" id="bio-g08-ch5-lec2" class="toggle-checkbox"><label for="bio-g08-ch5-lec2" class="toggle-label"></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>الصف الأول المتوسط (G07)</summary>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th class="chapter-col">الفصل</th><th class="desc-col">المحاضرة</th><th class="status-col">الحالة</th></tr></thead>
+            <tbody>
+              <tr><td class="chapter-col">الفصل الخامس</td><td class="desc-col">محاضرة 1 - اول متوسط الانزيمات</td><td class="status-cell"><input type="checkbox" id="bio-g07-ch5-lec1" class="toggle-checkbox"><label for="bio-g07-ch5-lec1" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الخامس</td><td class="desc-col">محاضرة 2 - الهورمونات والغدد</td><td class="status-cell"><input type="checkbox" id="bio-g07-ch5-lec2" class="toggle-checkbox"><label for="bio-g07-ch5-lec2" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الخامس</td><td class="desc-col">محاضرة 3 - الاحياء والطب - الخلايا السرطانية</td><td class="status-cell"><input type="checkbox" id="bio-g07-ch5-lec3" class="toggle-checkbox"><label for="bio-g07-ch5-lec3" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السادس</td><td class="desc-col">محاضرة 1 - الدرس الاول - نشأة علم الوراثة</td><td class="status-cell"><input type="checkbox" id="bio-g07-ch6-lec1" class="toggle-checkbox"><label for="bio-g07-ch6-lec1" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السادس</td><td class="desc-col">محاضرة 2 - الدرس الثاني - الكروموسومات ودورها</td><td class="status-cell"><input type="checkbox" id="bio-g07-ch6-lec2" class="toggle-checkbox"><label for="bio-g07-ch6-lec2" class="toggle-label"></label></td></tr>
             </tbody>
           </table>
         </div>
@@ -175,7 +199,151 @@
     </div>
   </div>
 
+  <div id="math" class="subject-content">
+    <div class="subject-card">
+      <div class="card-header">الرياضيات</div>
+      
+      <details open>
+        <summary>الصف السادس العلمي (G12)</summary>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th class="chapter-col">الفصل</th><th class="desc-col">المحاضرة</th><th class="status-col">الحالة</th></tr></thead>
+            <tbody>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 21 - التقريب (الاسئلة الجبرية) ج2</td><td class="status-cell"><input type="checkbox" id="math-g12-lec21" class="toggle-checkbox"><label for="math-g12-lec21" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 22 - التقريب (الاسئلة الجبرية) ج3</td><td class="status-cell"><input type="checkbox" id="math-g12-lec22" class="toggle-checkbox"><label for="math-g12-lec22" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 23 - التقريب (الاسئلة الجبرية) ج4</td><td class="status-cell"><input type="checkbox" id="math-g12-lec23" class="toggle-checkbox"><label for="math-g12-lec23" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 24 - التقريب (الاسئلة الهندسية) ج1</td><td class="status-cell"><input type="checkbox" id="math-g12-lec24" class="toggle-checkbox"><label for="math-g12-lec24" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 25 - التقريب (الاسئلة الهندسية) ج2</td><td class="status-cell"><input type="checkbox" id="math-g12-lec25" class="toggle-checkbox"><label for="math-g12-lec25" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 26 - التقريب (الاسئلة الهندسية) ج3</td><td class="status-cell"><input type="checkbox" id="math-g12-lec26" class="toggle-checkbox"><label for="math-g12-lec26" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 27 - التزايد والتناقص والنقاط الحرجة والتقعر</td><td class="status-cell"><input type="checkbox" id="math-g12-lec27" class="toggle-checkbox"><label for="math-g12-lec27" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 28 - التزايد والتناقص والنقاط الحرجة والتقعر</td><td class="status-cell"><input type="checkbox" id="math-g12-lec28" class="toggle-checkbox"><label for="math-g12-lec28" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 29 - ايجاد الثوابت ج1</td><td class="status-cell"><input type="checkbox" id="math-g12-lec29" class="toggle-checkbox"><label for="math-g12-lec29" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 30 - ايجاد الثوابت ج2</td><td class="status-cell"><input type="checkbox" id="math-g12-lec30" class="toggle-checkbox"><label for="math-g12-lec30" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 31 - ايجاد الثوابت ج3</td><td class="status-cell"><input type="checkbox" id="math-g12-lec31" class="toggle-checkbox"><label for="math-g12-lec31" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 32 - ايجاد الثوابت ج4</td><td class="status-cell"><input type="checkbox" id="math-g12-lec32" class="toggle-checkbox"><label for="math-g12-lec32" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 33 - رسم الدوال (خطوات الحل)</td><td class="status-cell"><input type="checkbox" id="math-g12-lec33" class="toggle-checkbox"><label for="math-g12-lec33" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 34 - رسم الدوال (كثيرة حدود) ج1</td><td class="status-cell"><input type="checkbox" id="math-g12-lec34" class="toggle-checkbox"><label for="math-g12-lec34" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثالث</td><td class="desc-col">محاضرة 35 - رسم الدوال (كثيرة الحدود)ج2</td><td class="status-cell"><input type="checkbox" id="math-g12-lec35" class="toggle-checkbox"><label for="math-g12-lec35" class="toggle-label"></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </div>
   </div>
+
+  <div id="arabic" class="subject-content">
+    <div class="subject-card">
+      <div class="card-header">اللغة العربية</div>
+      
+      <details open>
+        <summary>الصف الثالث المتوسط (G09)</summary>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th class="chapter-col">الفصل</th><th class="desc-col">المحاضرة</th><th class="status-col">الحالة</th></tr></thead>
+            <tbody>
+              <tr><td class="chapter-col">الفصل السادس</td><td class="desc-col">محاضرة 1 - القواعد - الصفة المشبهة</td><td class="status-cell"><input type="checkbox" id="arb-g09-ch6-lec1" class="toggle-checkbox"><label for="arb-g09-ch6-lec1" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السادس</td><td class="desc-col">محاضرة 2 - تمرينات الصفة المشبهة</td><td class="status-cell"><input type="checkbox" id="arb-g09-ch6-lec2" class="toggle-checkbox"><label for="arb-g09-ch6-lec2" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السادس</td><td class="desc-col">محاضرة 3 - الأدب - أبو القاسم الشابي</td><td class="status-cell"><input type="checkbox" id="arb-g09-ch6-lec3" class="toggle-checkbox"><label for="arb-g09-ch6-lec3" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السابع</td><td class="desc-col">محاضرة 1 - القواعد - اسم المفعول -الجزء الأول</td><td class="status-cell"><input type="checkbox" id="arb-g09-ch7-lec1" class="toggle-checkbox"><label for="arb-g09-ch7-lec1" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السابع</td><td class="desc-col">محاضرة 2 - القواعد - اسم المفعول - الجزء الثاني</td><td class="status-cell"><input type="checkbox" id="arb-g09-ch7-lec2" class="toggle-checkbox"><label for="arb-g09-ch7-lec2" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السابع</td><td class="desc-col">محاضرة 3 - تمرينات اسم المفعول</td><td class="status-cell"><input type="checkbox" id="arb-g09-ch7-lec3" class="toggle-checkbox"><label for="arb-g09-ch7-lec3" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السابع</td><td class="desc-col">محاضرة 4 - الأدب - بدر شاكر السياب</td><td class="status-cell"><input type="checkbox" id="arb-g09-ch7-lec4" class="toggle-checkbox"><label for="arb-g09-ch7-lec4" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثامن</td><td class="desc-col">محاضرة 1 - القواعد - اسم التفضيل - الجزء الأول</td><td class="status-cell"><input type="checkbox" id="arb-g09-ch8-lec1" class="toggle-checkbox"><label for="arb-g09-ch8-lec1" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثامن</td><td class="desc-col">محاضرة 2 - القواعد - اسم التفضيل - الجزء الثاني</td><td class="status-cell"><input type="checkbox" id="arb-g09-ch8-lec2" class="toggle-checkbox"><label for="arb-g09-ch8-lec2" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثامن</td><td class="desc-col">محاضرة 3 - تمرينات اسم التفضيل</td><td class="status-cell"><input type="checkbox" id="arb-g09-ch8-lec3" class="toggle-checkbox"><label for="arb-g09-ch8-lec3" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثامن</td><td class="desc-col">محاضرة 4 - الأدب - بلند الحيدري</td><td class="status-cell"><input type="checkbox" id="arb-g09-ch8-lec4" class="toggle-checkbox"><label for="arb-g09-ch8-lec4" class="toggle-label"></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>الصف الثاني المتوسط (G08)</summary>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th class="chapter-col">الفصل</th><th class="desc-col">المحاضرة</th><th class="status-col">الحالة</th></tr></thead>
+            <tbody>
+              <tr><td class="chapter-col">الفصل السادس</td><td class="desc-col">محاضرة 1 - القواعد - المفعول فيه</td><td class="status-cell"><input type="checkbox" id="arb-g08-ch6-lec1" class="toggle-checkbox"><label for="arb-g08-ch6-lec1" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السادس</td><td class="desc-col">محاضرة 2 - تمرينات المفعول فيه</td><td class="status-cell"><input type="checkbox" id="arb-g08-ch6-lec2" class="toggle-checkbox"><label for="arb-g08-ch6-lec2" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السادس</td><td class="desc-col">محاضرة 3 - الأدب - فوزي المعلوف</td><td class="status-cell"><input type="checkbox" id="arb-g08-ch6-lec3" class="toggle-checkbox"><label for="arb-g08-ch6-lec3" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السابع</td><td class="desc-col">محاضرة 1 - القواعد - المفعول المطلق</td><td class="status-cell"><input type="checkbox" id="arb-g08-ch7-lec1" class="toggle-checkbox"><label for="arb-g08-ch7-lec1" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل السابع</td><td class="desc-col">محاضرة 2 - تمرينات المفعول المطلق</td><td class="status-cell"><input type="checkbox" id="arb-g08-ch7-lec2" class="toggle-checkbox"><label for="arb-g08-ch7-lec2" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثامن</td><td class="desc-col">محاضرة 1 - الحال</td><td class="status-cell"><input type="checkbox" id="arb-g08-ch8-lec1" class="toggle-checkbox"><label for="arb-g08-ch8-lec1" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثامن</td><td class="desc-col">محاضرة 2 - تمرينات الحال</td><td class="status-cell"><input type="checkbox" id="arb-g08-ch8-lec2" class="toggle-checkbox"><label for="arb-g08-ch8-lec2" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الثامن</td><td class="desc-col">محاضرة 3 - الأدب - نازك الملائكة</td><td class="status-cell"><input type="checkbox" id="arb-g08-ch8-lec3" class="toggle-checkbox"><label for="arb-g08-ch8-lec3" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل التاسع</td><td class="desc-col">محاضرة 1 - القواعد - الاستثناء</td><td class="status-cell"><input type="checkbox" id="arb-g08-ch9-lec1" class="toggle-checkbox"><label for="arb-g08-ch9-lec1" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل التاسع</td><td class="desc-col">محاضرة 2 - تمرينات الاستثناء</td><td class="status-cell"><input type="checkbox" id="arb-g08-ch9-lec2" class="toggle-checkbox"><label for="arb-g08-ch9-lec2" class="toggle-label"></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>الصف الأول المتوسط (G07)</summary>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th class="chapter-col">الفصل</th><th class="desc-col">المحاضرة</th><th class="status-col">الحالة</th></tr></thead>
+            <tbody>
+              <tr><td class="chapter-col">الفصل التاسع</td><td class="desc-col">محاضرة 1 - القواعد - الفعل الماضي</td><td class="status-cell"><input type="checkbox" id="arb-g07-ch9-lec1" class="toggle-checkbox"><label for="arb-g07-ch9-lec1" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل التاسع</td><td class="desc-col">محاضرة 2 - تمرينات الفعل الماضي</td><td class="status-cell"><input type="checkbox" id="arb-g07-ch9-lec2" class="toggle-checkbox"><label for="arb-g07-ch9-lec2" class="toggle-label"></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div id="physics" class="subject-content">
+    <div class="subject-card">
+      <div class="card-header">الفيزياء</div>
+      
+      <details open>
+        <summary>الصف الثاني المتوسط (G08)</summary>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th class="chapter-col">الفصل</th><th class="desc-col">المحاضرة</th><th class="status-col">الحالة</th></tr></thead>
+            <tbody>
+              <tr><td class="chapter-col">Chapter 5</td><td class="desc-col">Full Chapter</td><td class="status-cell"><input type="checkbox" id="phy-g08-ch5" class="toggle-checkbox"><label for="phy-g08-ch5" class="toggle-label"></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>الصف الأول المتوسط (G07)</summary>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th class="chapter-col">الفصل</th><th class="desc-col">المحاضرة</th><th class="status-col">الحالة</th></tr></thead>
+            <tbody>
+              <tr><td class="chapter-col">الفصل الخامس</td><td class="desc-col">محاضرة 2 - تمدد المواد</td><td class="status-cell"><input type="checkbox" id="phy-g07-ch5-lec2" class="toggle-checkbox"><label for="phy-g07-ch5-lec2" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الخامس</td><td class="desc-col">محاضرة 3 - الانصهار والانجماد</td><td class="status-cell"><input type="checkbox" id="phy-g07-ch5-lec3" class="toggle-checkbox"><label for="phy-g07-ch5-lec3" class="toggle-label"></label></td></tr>
+              <tr><td class="chapter-col">الفصل الخامس</td><td class="desc-col">محاضرة 4 - التبخر والغليان</td><td class="status-cell"><input type="checkbox" id="phy-g07-ch5-lec4" class="toggle-checkbox"><label for="phy-g07-ch5-lec4" class="toggle-label"></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div id="english" class="subject-content">
+    <div class="subject-card">
+      <div class="card-header">اللغة الإنجليزية</div>
+      
+      <details open>
+        <summary>الصف السادس العلمي (G12)</summary>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th class="chapter-col">الوحدة</th><th class="desc-col">التفاصيل</th><th class="status-col">الحالة</th></tr></thead>
+            <tbody>
+              <tr><td class="chapter-col">Unit 3</td><td class="desc-col">Full Unit</td><td class="status-cell"><input type="checkbox" id="eng-g12-u3" class="toggle-checkbox"><label for="eng-g12-u3" class="toggle-label"></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  </div>
+
+</div>
 
 <script type="module">
   // 1. Import Firebase
@@ -184,38 +352,36 @@
 
   // 2. PASTE YOUR CONFIG HERE (From Firebase Console)
   const firebaseConfig = {
-    apiKey: "AIzaSyB...", // REPLACE THIS
-    authDomain: "YOUR-PROJECT.firebaseapp.com", // REPLACE THIS
-    databaseURL: "https://YOUR-PROJECT-default-rtdb.firebaseio.com", // REPLACE THIS
-    projectId: "YOUR-PROJECT", // REPLACE THIS
-    storageBucket: "YOUR-PROJECT.appspot.com", // REPLACE THIS
-    messagingSenderId: "123456...", // REPLACE THIS
-    appId: "1:123456..." // REPLACE THIS
+    apiKey: "AIzaSyAyd9-ZWLb_3wSQCHpLg5LcXuEs9gG9awg",
+    authDomain: "ankidoquestions.firebaseapp.com",
+    databaseURL: "https://ankidoquestions-default-rtdb.firebaseio.com",
+    projectId: "ankidoquestions",
+    storageBucket: "ankidoquestions.firebasestorage.app",
+    messagingSenderId: "439745187858",
+    appId: "1:439745187858:web:dcfa99e035af45ba31c8cb"
   };
 
   // 3. Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  // 4. Function to Update Database when User Clicks
+  // 4. Update Function
   function updateStatus(id, isChecked) {
     set(ref(db, 'lectures/' + id), isChecked);
   }
 
-  // 5. Add Event Listeners to all Checkboxes
-  const checkboxes = document.querySelectorAll('.toggle-checkbox');
-  checkboxes.forEach(box => {
+  // 5. Add Event Listeners
+  document.querySelectorAll('.toggle-checkbox').forEach(box => {
     box.addEventListener('change', (e) => {
       updateStatus(e.target.id, e.target.checked);
     });
   });
 
-  // 6. Listen for Changes from Database (Sync)
+  // 6. Sync Function (Listen for Changes)
   const dbRef = ref(db, 'lectures');
   onValue(dbRef, (snapshot) => {
     const data = snapshot.val();
     if (data) {
-      // Loop through the data and update the UI
       Object.keys(data).forEach(key => {
         const checkbox = document.getElementById(key);
         if (checkbox) {
@@ -224,17 +390,18 @@
       });
     }
   });
-</script>
 
-<script>
-  // Tab Switching Logic
-  function openSubject(subjectId) {
-    const contents = document.querySelectorAll('.subject-content');
-    contents.forEach(content => content.classList.remove('active-content'));
-    const buttons = document.querySelectorAll('.tab-btn');
-    buttons.forEach(btn => btn.classList.remove('active'));
+  // Make tab switching global for onClick
+  window.openSubject = function(subjectId) {
+    document.querySelectorAll('.subject-content').forEach(c => c.classList.remove('active-content'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(subjectId).classList.add('active-content');
-    event.target.classList.add('active');
+    
+    // Highlight the button that was clicked
+    // We find the button by the text or attribute if needed, but here simple click targeting works:
+    if (event && event.target) {
+        event.target.classList.add('active');
+    }
   }
 </script>
 
