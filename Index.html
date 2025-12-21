@@ -2,210 +2,78 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>جدول المحاضرات الدراسي</title>
+  <title>جدول المحاضرات - المزامنة</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
+    /* ... (Previous Styles Remain the Same) ... */
     :root {
       --bg: #f4f6fb;
       --card: #ffffff;
       --primary: #2f3a8f;
-      --primary-hover: #1e255e;
       --secondary: #e9ecff;
       --text: #1f2937;
       --muted: #6b7280;
       --border: #e5e7eb;
       --radius: 14px;
+      --success: #10b981;
     }
 
-    body {
-      margin: 0;
-      font-family: "Cairo", system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 32px 20px 60px;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 32px;
-      color: var(--primary);
-    }
-
-    header p {
-      color: var(--muted);
-      margin-top: 8px;
-    }
-
-    /* Tabs Navigation Style */
-    .tabs-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 30px;
-      background: #fff;
-      padding: 15px;
-      border-radius: var(--radius);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }
-
-    .tab-btn {
-      background: transparent;
-      border: 2px solid var(--secondary);
-      color: var(--muted);
-      padding: 10px 20px;
-      border-radius: 50px;
-      font-family: "Cairo", sans-serif;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .tab-btn:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-
-    .tab-btn.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #fff;
-      box-shadow: 0 4px 10px rgba(47, 58, 143, 0.3);
-    }
-
-    /* Content Area */
-    .subject-content {
-      display: none; /* Hidden by default */
-      animation: fadeIn 0.4s ease-in-out;
-    }
-
-    .subject-content.active-content {
-      display: block; /* Show when active */
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .subject-card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-      margin-bottom: 28px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
-
-    .card-header {
-      padding: 18px 22px;
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--primary);
-      background: linear-gradient(135deg, var(--secondary), #ffffff);
-      border-bottom: 1px solid var(--border);
-    }
-
-    details {
-      border-bottom: 1px solid var(--border);
-    }
-
-    details:last-child {
-      border-bottom: none;
-    }
-
-    summary {
-      cursor: pointer;
-      padding: 16px 22px;
-      font-weight: 600;
-      background: #fafbff;
-      transition: background 0.2s;
-      list-style: none; /* Remove default triangle in some browsers */
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    body { margin: 0; font-family: "Cairo", system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    .container { max-width: 1100px; margin: auto; padding: 32px 20px 60px; }
+    header { text-align: center; margin-bottom: 30px; }
     
-    summary::-webkit-details-marker {
-      display: none;
-    }
+    /* Tabs Style */
+    .tabs-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px; background: #fff; padding: 15px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .tab-btn { background: transparent; border: 2px solid var(--secondary); color: var(--muted); padding: 10px 20px; border-radius: 50px; font-family: "Cairo", sans-serif; font-weight: 700; cursor: pointer; transition: all 0.3s ease; }
+    .tab-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .tab-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 
-    summary::after {
-      content: '+';
-      font-size: 20px;
-      color: var(--primary);
-      font-weight: bold;
-    }
-
-    details[open] summary::after {
-      content: '-';
-    }
-
-    summary:hover {
-      background: #f0f4ff;
-    }
-
-    .table-wrapper {
-      padding: 12px 26px 22px;
-      background: #fff;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-      text-align: right;
-    }
-
-    th {
-      width: 25%;
-      color: var(--primary);
-      font-weight: 700;
-      background-color: #fcfcfc;
-      border-left: 1px solid var(--border);
-    }
+    /* Content & Tables */
+    .subject-content { display: none; animation: fadeIn 0.4s ease-in-out; }
+    .subject-content.active-content { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
-    tr:last-child th, tr:last-child td {
-      border-bottom: none;
-    }
+    .subject-card { background: var(--card); border-radius: var(--radius); margin-bottom: 28px; border: 1px solid var(--border); overflow: hidden; }
+    .card-header { padding: 18px 22px; font-size: 22px; font-weight: 700; color: var(--primary); background: linear-gradient(135deg, var(--secondary), #ffffff); border-bottom: 1px solid var(--border); }
+    
+    details { border-bottom: 1px solid var(--border); }
+    summary { cursor: pointer; padding: 16px 22px; font-weight: 600; background: #fafbff; display: flex; justify-content: space-between; align-items: center; }
+    
+    .table-wrapper { padding: 12px; background: #fff; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    
+    /* Column Widths */
+    th.chapter-col { width: 25%; text-align: right; color: var(--primary); background-color: #fcfcfc; }
+    td.desc-col { text-align: right; }
+    
+    /* STATUS TOGGLE STYLE */
+    th.status-col { width: 150px; text-align: center; color: var(--muted); }
+    td.status-cell { text-align: center; }
 
-    /* Mobile Responsive */
+    /* Custom Checkbox Design */
+    .toggle-checkbox { display: none; }
+    .toggle-label {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 6px 12px; border-radius: 20px; cursor: pointer;
+      background-color: #eee; color: #777; font-size: 14px; font-weight: bold;
+      transition: all 0.3s ease; border: 1px solid #ddd; width: 100px;
+    }
+    .toggle-label::after { content: "غير جاهز"; }
+    
+    /* Checked State */
+    .toggle-checkbox:checked + .toggle-label {
+      background-color: var(--success); color: white; border-color: var(--success);
+    }
+    .toggle-checkbox:checked + .toggle-label::after { content: "تم الرفع"; }
+
     @media (max-width: 600px) {
-      .tabs-container {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        justify-content: flex-start;
-        padding-bottom: 15px;
-      }
-      
-      .tab-btn {
-        white-space: nowrap;
-        flex: 0 0 auto;
-      }
-      
-      th {
-        width: 35%;
-        font-size: 14px;
-      }
+      .tabs-container { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; }
+      .tab-btn { white-space: nowrap; flex: 0 0 auto; }
+      th.chapter-col { width: 30%; font-size: 13px; }
+      .toggle-label { padding: 4px 8px; font-size: 12px; width: 70px; }
     }
   </style>
 </head>
@@ -213,18 +81,14 @@
 <body>
 <div class="container">
   <header>
-    <h1>المواد والمحاضرات</h1>
-    <p>اختر المادة من القائمة أدناه لعرض التفاصيل</p>
+    <h1>لوحة متابعة المحاضرات</h1>
+    <p>اضغط على الزر عند رفع الأسئلة. سيتم التحديث لدى جميع الأساتذة تلقائياً.</p>
   </header>
 
   <div class="tabs-container">
     <button class="tab-btn active" onclick="openSubject('chemistry')">الكيمياء</button>
     <button class="tab-btn" onclick="openSubject('biology')">الأحياء</button>
-    <button class="tab-btn" onclick="openSubject('math')">الرياضيات</button>
-    <button class="tab-btn" onclick="openSubject('arabic')">اللغة العربية</button>
-    <button class="tab-btn" onclick="openSubject('physics')">الفيزياء</button>
-    <button class="tab-btn" onclick="openSubject('english')">اللغة الإنجليزية</button>
-  </div>
+    </div>
 
   <div id="chemistry" class="subject-content active-content">
     <div class="subject-card">
@@ -234,23 +98,39 @@
         <summary>السادس العلمي</summary>
         <div class="table-wrapper">
           <table>
-            <tr><th>الفصل الرابع</th><td>محاضرة 6 - التعبير عن الخلية كتابة</td></tr>
-            <tr><th>الفصل الرابع</th><td>محاضرة 7 - حساب جهد الخلية</td></tr>
-            <tr><th>الفصل الرابع</th><td>محاضرة 8 - تحديد تلقائية تفاعل الخلية</td></tr>
-          </table>
-        </div>
-      </details>
-
-      <details>
-        <summary>الثالث المتوسط</summary>
-        <div class="table-wrapper">
-          <table>
-            <tr><th>الفصل السادس</th><td>محاضرة 3 - غاز الميثان</td></tr>
-            <tr><th>الفصل السادس</th><td>محاضرة 4 - غاز الإيثيلين</td></tr>
-            <tr><th>الفصل السادس</th><td>محاضرة 5 - غاز الأسيتيلين</td></tr>
-            <tr><th>الفصل السادس</th><td>محاضرة 6 - الكحول الإيثيلي</td></tr>
-            <tr><th>الفصل السادس</th><td>محاضرة 7 - حامض الخليك - البنزين - الفينول</td></tr>
-            <tr><th>الفصل السادس</th><td>محاضرة 8 - حل أسئلة الفصل</td></tr>
+            <thead>
+              <tr>
+                <th class="chapter-col">الفصل</th>
+                <th class="desc-col">المحاضرة</th>
+                <th class="status-col">حالة الأسئلة</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="chapter-col">الفصل الرابع</td>
+                <td class="desc-col">محاضرة 6 - التعبير عن الخلية كتابة</td>
+                <td class="status-cell">
+                  <input type="checkbox" id="chem-g12-lec6" class="toggle-checkbox">
+                  <label for="chem-g12-lec6" class="toggle-label"></label>
+                </td>
+              </tr>
+              <tr>
+                <td class="chapter-col">الفصل الرابع</td>
+                <td class="desc-col">محاضرة 7 - حساب جهد الخلية</td>
+                <td class="status-cell">
+                  <input type="checkbox" id="chem-g12-lec7" class="toggle-checkbox">
+                  <label for="chem-g12-lec7" class="toggle-label"></label>
+                </td>
+              </tr>
+              <tr>
+                <td class="chapter-col">الفصل الرابع</td>
+                <td class="desc-col">محاضرة 8 - تحديد تلقائية تفاعل الخلية</td>
+                <td class="status-cell">
+                  <input type="checkbox" id="chem-g12-lec8" class="toggle-checkbox">
+                  <label for="chem-g12-lec8" class="toggle-label"></label>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </details>
@@ -260,211 +140,101 @@
   <div id="biology" class="subject-content">
     <div class="subject-card">
       <div class="card-header">الأحياء</div>
-
       <details open>
         <summary>السادس العلمي</summary>
         <div class="table-wrapper">
           <table>
-            <tr><th>الفصل الثالث</th><td>محاضرة 14 - المتك وتكوين حبوب اللقاح</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 15 - المبيض وتكوين البيوض في النباتات الزهرية</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 16 - تكوين أنبوب اللقاح وعملية الإخصاب وتكوين الجنين</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 17 - تكوين البذرة وأنواع التلقيح</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 18 - تكوين الثمرة</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 19 - الإثمار العذري وتركيب الثمرة وانتشار البذور والثمار</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 20 - التكاثر في الحشرات (الجهاز الذكري)</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 21 - التكاثر في الحشرات (الجهاز الأنثوي والإخصاب)</td></tr>
-          </table>
-        </div>
-      </details>
-
-      <details>
-        <summary>الثالث المتوسط</summary>
-        <div class="table-wrapper">
-          <table>
-            <tr><th>الفصل السادس</th><td>الفصل بالكامل</td></tr>
-            <tr><th>الفصل السابع</th><td>الفصل بالكامل</td></tr>
-          </table>
-        </div>
-      </details>
-
-      <details>
-        <summary>الثاني المتوسط</summary>
-        <div class="table-wrapper">
-          <table>
-            <tr><th>الفصل الرابع</th><td>محاضرة 1 - الدرس الأول ج1: الطحالب</td></tr>
-            <tr><th>الفصل الرابع</th><td>محاضرة 2 - الدرس الأول ج2: النباتات اللابذرية</td></tr>
-            <tr><th>الفصل الرابع</th><td>محاضرة 3 - الدرس الثاني ج1: النباتات البذرية</td></tr>
-            <tr><th>الفصل الرابع</th><td>محاضرة 4 - النباتات البذرية وأنواعها</td></tr>
-            <tr><th>الفصل الخامس</th><td>محاضرة 1 - اللافقريات (الإسفنجيات + أمعائية الجوف)</td></tr>
-            <tr><th>الفصل الخامس</th><td>محاضرة 2 - اللافقريات (الديدان بأنواعها الثلاثة)</td></tr>
-          </table>
-        </div>
-      </details>
-
-      <details>
-        <summary>الأول المتوسط</summary>
-        <div class="table-wrapper">
-          <table>
-            <tr><th>الفصل الخامس</th><td>محاضرة 1 - الإنزيمات</td></tr>
-            <tr><th>الفصل الخامس</th><td>محاضرة 2 - الهرمونات والغدد</td></tr>
-            <tr><th>الفصل الخامس</th><td>محاضرة 3 - الأحياء والطب (الخلايا السرطانية)</td></tr>
-            <tr><th>الفصل السادس</th><td>محاضرة 1 - الدرس الأول: نشأة علم الوراثة</td></tr>
-            <tr><th>الفصل السادس</th><td>محاضرة 2 - الدرس الثاني: الكروموسومات ودورها في الوراثة</td></tr>
+            <thead>
+              <tr>
+                <th class="chapter-col">الفصل</th>
+                <th class="desc-col">المحاضرة</th>
+                <th class="status-col">حالة الأسئلة</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="chapter-col">الفصل الثالث</td>
+                <td class="desc-col">محاضرة 14 - المتك وتكوين حبوب اللقاح</td>
+                <td class="status-cell">
+                  <input type="checkbox" id="bio-g12-lec14" class="toggle-checkbox">
+                  <label for="bio-g12-lec14" class="toggle-label"></label>
+                </td>
+              </tr>
+              <tr>
+                <td class="chapter-col">الفصل الثالث</td>
+                <td class="desc-col">محاضرة 15 - المبيض وتكوين البيوض</td>
+                <td class="status-cell">
+                  <input type="checkbox" id="bio-g12-lec15" class="toggle-checkbox">
+                  <label for="bio-g12-lec15" class="toggle-label"></label>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </details>
     </div>
   </div>
 
-  <div id="math" class="subject-content">
-    <div class="subject-card">
-      <div class="card-header">الرياضيات</div>
-
-      <details open>
-        <summary>السادس العلمي</summary>
-        <div class="table-wrapper">
-          <table>
-            <tr><th>الفصل الثالث</th><td>محاضرة 21 - التقريب (الأسئلة الجبرية) ج2</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 22 - التقريب (الأسئلة الجبرية) ج3</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 23 - التقريب (الأسئلة الجبرية) ج4</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 24 - التقريب (الأسئلة الهندسية) ج1</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 25 - التقريب (الأسئلة الهندسية) ج2</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 26 - التقريب (الأسئلة الهندسية) ج3</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 27 - التزايد والتناقص والنقاط الحرجة والتقعر</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 28 - تكملة التزايد والتناقص والنقاط الحرجة</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 29 - إيجاد الثوابت ج1</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 30 - إيجاد الثوابت ج2</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 31 - إيجاد الثوابت ج3</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 32 - إيجاد الثوابت ج4</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 33 - رسم الدوال (خطوات الحل)</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 34 - رسم الدوال (كثيرة الحدود) ج1</td></tr>
-            <tr><th>الفصل الثالث</th><td>محاضرة 35 - رسم الدوال (كثيرة الحدود) ج2</td></tr>
-          </table>
-        </div>
-      </details>
-    </div>
   </div>
 
-  <div id="arabic" class="subject-content">
-    <div class="subject-card">
-      <div class="card-header">اللغة العربية</div>
+<script type="module">
+  // 1. Import Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-      <details open>
-        <summary>الثالث المتوسط</summary>
-        <div class="table-wrapper">
-          <table>
-            <tr><th>الفصل السادس</th><td>محاضرة 1 - القواعد: الصفة المشبهة</td></tr>
-            <tr><th>الفصل السادس</th><td>محاضرة 2 - تمرينات الصفة المشبهة</td></tr>
-            <tr><th>الفصل السادس</th><td>محاضرة 3 - الأدب: أبو القاسم الشابي</td></tr>
-            <tr><th>الفصل السابع</th><td>محاضرة 1 - القواعد: اسم المفعول (ج1)</td></tr>
-            <tr><th>الفصل السابع</th><td>محاضرة 2 - القواعد: اسم المفعول (ج2)</td></tr>
-            <tr><th>الفصل السابع</th><td>محاضرة 3 - تمرينات اسم المفعول</td></tr>
-            <tr><th>الفصل السابع</th><td>محاضرة 4 - الأدب: بدر شاكر السياب</td></tr>
-            <tr><th>الفصل الثامن</th><td>محاضرة 1 - القواعد: اسم التفضيل (ج1)</td></tr>
-            <tr><th>الفصل الثامن</th><td>محاضرة 2 - القواعد: اسم التفضيل (ج2)</td></tr>
-            <tr><th>الفصل الثامن</th><td>محاضرة 3 - تمرينات اسم التفضيل</td></tr>
-            <tr><th>الفصل الثامن</th><td>محاضرة 4 - الأدب: بلند الحيدري</td></tr>
-          </table>
-        </div>
-      </details>
+  // 2. PASTE YOUR CONFIG HERE (From Firebase Console)
+  const firebaseConfig = {
+    apiKey: "AIzaSyB...", // REPLACE THIS
+    authDomain: "YOUR-PROJECT.firebaseapp.com", // REPLACE THIS
+    databaseURL: "https://YOUR-PROJECT-default-rtdb.firebaseio.com", // REPLACE THIS
+    projectId: "YOUR-PROJECT", // REPLACE THIS
+    storageBucket: "YOUR-PROJECT.appspot.com", // REPLACE THIS
+    messagingSenderId: "123456...", // REPLACE THIS
+    appId: "1:123456..." // REPLACE THIS
+  };
 
-      <details>
-        <summary>الثاني المتوسط</summary>
-        <div class="table-wrapper">
-          <table>
-            <tr><th>الفصل السادس</th><td>محاضرة 1 - القواعد: المفعول فيه</td></tr>
-            <tr><th>الفصل السادس</th><td>محاضرة 2 - تمرينات المفعول فيه</td></tr>
-            <tr><th>الفصل السادس</th><td>محاضرة 3 - الأدب: فوزي المعلوف</td></tr>
-            <tr><th>الفصل السابع</th><td>محاضرة 1 - القواعد: المفعول المطلق</td></tr>
-            <tr><th>الفصل السابع</th><td>محاضرة 2 - تمرينات المفعول المطلق</td></tr>
-            <tr><th>الفصل الثامن</th><td>محاضرة 1 - القواعد: الحال</td></tr>
-            <tr><th>الفصل الثامن</th><td>محاضرة 2 - تمرينات الحال</td></tr>
-            <tr><th>الفصل الثامن</th><td>محاضرة 3 - الأدب: نازك الملائكة</td></tr>
-            <tr><th>الفصل التاسع</th><td>محاضرة 1 - القواعد: الاستثناء</td></tr>
-            <tr><th>الفصل التاسع</th><td>محاضرة 2 - تمرينات الاستثناء</td></tr>
-          </table>
-        </div>
-      </details>
+  // 3. Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-      <details>
-        <summary>الأول المتوسط</summary>
-        <div class="table-wrapper">
-          <table>
-            <tr><th>الفصل التاسع</th><td>محاضرة 1 - القواعد: الفعل الماضي</td></tr>
-            <tr><th>الفصل التاسع</th><td>محاضرة 2 - تمرينات الفعل الماضي</td></tr>
-          </table>
-        </div>
-      </details>
-    </div>
-  </div>
+  // 4. Function to Update Database when User Clicks
+  function updateStatus(id, isChecked) {
+    set(ref(db, 'lectures/' + id), isChecked);
+  }
 
-  <div id="physics" class="subject-content">
-    <div class="subject-card">
-      <div class="card-header">الفيزياء</div>
+  // 5. Add Event Listeners to all Checkboxes
+  const checkboxes = document.querySelectorAll('.toggle-checkbox');
+  checkboxes.forEach(box => {
+    box.addEventListener('change', (e) => {
+      updateStatus(e.target.id, e.target.checked);
+    });
+  });
 
-      <details open>
-        <summary>الثاني المتوسط</summary>
-        <div class="table-wrapper">
-          <table>
-            <tr><th>الفصل الخامس</th><td>الفصل بالكامل</td></tr>
-          </table>
-        </div>
-      </details>
-
-      <details>
-        <summary>الأول المتوسط</summary>
-        <div class="table-wrapper">
-          <table>
-            <tr><th>الفصل الخامس</th><td>محاضرة 2 - تمدد المواد</td></tr>
-            <tr><th>الفصل الخامس</th><td>محاضرة 3 - الانصهار والانجماد</td></tr>
-            <tr><th>الفصل الخامس</th><td>محاضرة 4 - التبخر والغليان</td></tr>
-          </table>
-        </div>
-      </details>
-    </div>
-  </div>
-
-  <div id="english" class="subject-content">
-    <div class="subject-card">
-      <div class="card-header">اللغة الإنجليزية</div>
-
-      <details open>
-        <summary>السادس العلمي</summary>
-        <div class="table-wrapper">
-          <table>
-            <tr><th>الوحدة الثالثة</th><td>الوحدة بالكامل (Unit 3)</td></tr>
-          </table>
-        </div>
-      </details>
-    </div>
-  </div>
-
-</div>
+  // 6. Listen for Changes from Database (Sync)
+  const dbRef = ref(db, 'lectures');
+  onValue(dbRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      // Loop through the data and update the UI
+      Object.keys(data).forEach(key => {
+        const checkbox = document.getElementById(key);
+        if (checkbox) {
+          checkbox.checked = data[key];
+        }
+      });
+    }
+  });
+</script>
 
 <script>
+  // Tab Switching Logic
   function openSubject(subjectId) {
-    // 1. Hide all subject contents
     const contents = document.querySelectorAll('.subject-content');
-    contents.forEach(content => {
-      content.classList.remove('active-content');
-    });
-
-    // 2. Remove 'active' class from all buttons
+    contents.forEach(content => content.classList.remove('active-content'));
     const buttons = document.querySelectorAll('.tab-btn');
-    buttons.forEach(btn => {
-      btn.classList.remove('active');
-    });
-
-    // 3. Show the selected subject
+    buttons.forEach(btn => btn.classList.remove('active'));
     document.getElementById(subjectId).classList.add('active-content');
-
-    // 4. Add 'active' class to the clicked button
-    // Find the button that called this function based on the text or logic, 
-    // or easier: use event.currentTarget if passed, but here we can just loop
-    // Since we are inside the function call from HTML, let's use a simpler approach 
-    // to highlight the button:
-    const clickedBtn = event.target;
-    clickedBtn.classList.add('active');
+    event.target.classList.add('active');
   }
 </script>
 
