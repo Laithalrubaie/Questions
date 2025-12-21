@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>المواد والمحاضرات</title>
+  <title>جدول المحاضرات الدراسي</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
@@ -12,6 +12,7 @@
       --bg: #f4f6fb;
       --card: #ffffff;
       --primary: #2f3a8f;
+      --primary-hover: #1e255e;
       --secondary: #e9ecff;
       --text: #1f2937;
       --muted: #6b7280;
@@ -34,7 +35,7 @@
 
     header {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
     }
 
     header h1 {
@@ -45,9 +46,63 @@
 
     header p {
       color: var(--muted);
+      margin-top: 8px;
     }
 
-    .subject {
+    /* Tabs Navigation Style */
+    .tabs-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 30px;
+      background: #fff;
+      padding: 15px;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 2px solid var(--secondary);
+      color: var(--muted);
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-family: "Cairo", sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(47, 58, 143, 0.3);
+    }
+
+    /* Content Area */
+    .subject-content {
+      display: none; /* Hidden by default */
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .subject-content.active-content {
+      display: block; /* Show when active */
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .subject-card {
       background: var(--card);
       border-radius: var(--radius);
       box-shadow: 0 10px 30px rgba(0,0,0,0.06);
@@ -56,16 +111,13 @@
       overflow: hidden;
     }
 
-    .subject-header {
+    .card-header {
       padding: 18px 22px;
       font-size: 22px;
       font-weight: 700;
       color: var(--primary);
       background: linear-gradient(135deg, var(--secondary), #ffffff);
       border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
 
     details {
@@ -82,13 +134,32 @@
       font-weight: 600;
       background: #fafbff;
       transition: background 0.2s;
+      list-style: none; /* Remove default triangle in some browsers */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: '+';
+      font-size: 20px;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    details[open] summary::after {
+      content: '-';
     }
 
     summary:hover {
       background: #f0f4ff;
     }
 
-    .content {
+    .table-wrapper {
       padding: 12px 26px 22px;
       background: #fff;
     }
@@ -102,229 +173,300 @@
       padding: 12px;
       border-bottom: 1px solid var(--border);
       vertical-align: top;
+      text-align: right;
     }
 
     th {
-      width: 160px;
-      color: var(--muted);
-      font-weight: 600;
+      width: 25%;
+      color: var(--primary);
+      font-weight: 700;
       background-color: #fcfcfc;
+      border-left: 1px solid var(--border);
     }
     
     tr:last-child th, tr:last-child td {
       border-bottom: none;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 600px) {
+      .tabs-container {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding-bottom: 15px;
+      }
+      
+      .tab-btn {
+        white-space: nowrap;
+        flex: 0 0 auto;
+      }
+      
+      th {
+        width: 35%;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
 
 <body>
 <div class="container">
-<header>
-  <h1>المواد والمحاضرات</h1>
-  <p>قائمة المحاضرات المطلوبة مرتبة حسب المادة والمرحلة الدراسية</p>
-</header>
+  <header>
+    <h1>المواد والمحاضرات</h1>
+    <p>اختر المادة من القائمة أدناه لعرض التفاصيل</p>
+  </header>
 
-<section class="subject">
-  <div class="subject-header">Chemistry</div>
+  <div class="tabs-container">
+    <button class="tab-btn active" onclick="openSubject('chemistry')">الكيمياء</button>
+    <button class="tab-btn" onclick="openSubject('biology')">الأحياء</button>
+    <button class="tab-btn" onclick="openSubject('math')">الرياضيات</button>
+    <button class="tab-btn" onclick="openSubject('arabic')">اللغة العربية</button>
+    <button class="tab-btn" onclick="openSubject('physics')">الفيزياء</button>
+    <button class="tab-btn" onclick="openSubject('english')">اللغة الإنجليزية</button>
+  </div>
 
-  <details open>
-    <summary>الصف السادس إعدادي (G12)</summary>
-    <div class="content">
-      <table>
-        <tr><th>الفصل الرابع</th><td>محاضرة 6 - التعبير عن الخلية كتابة</td></tr>
-        <tr><th>الفصل الرابع</th><td>محاضرة 7 - حساب جهد الخلية</td></tr>
-        <tr><th>الفصل الرابع</th><td>محاضرة 8 - تحديد تلقائية تفاعل الخلية</td></tr>
-      </table>
+  <div id="chemistry" class="subject-content active-content">
+    <div class="subject-card">
+      <div class="card-header">الكيمياء</div>
+      
+      <details open>
+        <summary>السادس العلمي</summary>
+        <div class="table-wrapper">
+          <table>
+            <tr><th>الفصل الرابع</th><td>محاضرة 6 - التعبير عن الخلية كتابة</td></tr>
+            <tr><th>الفصل الرابع</th><td>محاضرة 7 - حساب جهد الخلية</td></tr>
+            <tr><th>الفصل الرابع</th><td>محاضرة 8 - تحديد تلقائية تفاعل الخلية</td></tr>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>الثالث المتوسط</summary>
+        <div class="table-wrapper">
+          <table>
+            <tr><th>الفصل السادس</th><td>محاضرة 3 - غاز الميثان</td></tr>
+            <tr><th>الفصل السادس</th><td>محاضرة 4 - غاز الإيثيلين</td></tr>
+            <tr><th>الفصل السادس</th><td>محاضرة 5 - غاز الأسيتيلين</td></tr>
+            <tr><th>الفصل السادس</th><td>محاضرة 6 - الكحول الإيثيلي</td></tr>
+            <tr><th>الفصل السادس</th><td>محاضرة 7 - حامض الخليك - البنزين - الفينول</td></tr>
+            <tr><th>الفصل السادس</th><td>محاضرة 8 - حل أسئلة الفصل</td></tr>
+          </table>
+        </div>
+      </details>
     </div>
-  </details>
+  </div>
 
-  <details>
-    <summary>الصف الثالث متوسط (G09)</summary>
-    <div class="content">
-      <table>
-        <tr><th>الفصل السادس</th><td>محاضرة 3 غاز الميثان</td></tr>
-        <tr><th>الفصل السادس</th><td>محاضرة 4 غاز الاثلين</td></tr>
-        <tr><th>الفصل السادس</th><td>محاضرة 5 غاز الاستلين</td></tr>
-        <tr><th>الفصل السادس</th><td>محاضرة 6 الكحول الاثيلي</td></tr>
-        <tr><th>الفصل السادس</th><td>محاضرة 7 حامض الخليك-البنزين-الفينول</td></tr>
-        <tr><th>الفصل السادس</th><td>محاضرة 8 - حل اسئلة الفصل</td></tr>
-      </table>
+  <div id="biology" class="subject-content">
+    <div class="subject-card">
+      <div class="card-header">الأحياء</div>
+
+      <details open>
+        <summary>السادس العلمي</summary>
+        <div class="table-wrapper">
+          <table>
+            <tr><th>الفصل الثالث</th><td>محاضرة 14 - المتك وتكوين حبوب اللقاح</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 15 - المبيض وتكوين البيوض في النباتات الزهرية</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 16 - تكوين أنبوب اللقاح وعملية الإخصاب وتكوين الجنين</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 17 - تكوين البذرة وأنواع التلقيح</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 18 - تكوين الثمرة</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 19 - الإثمار العذري وتركيب الثمرة وانتشار البذور والثمار</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 20 - التكاثر في الحشرات (الجهاز الذكري)</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 21 - التكاثر في الحشرات (الجهاز الأنثوي والإخصاب)</td></tr>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>الثالث المتوسط</summary>
+        <div class="table-wrapper">
+          <table>
+            <tr><th>الفصل السادس</th><td>الفصل بالكامل</td></tr>
+            <tr><th>الفصل السابع</th><td>الفصل بالكامل</td></tr>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>الثاني المتوسط</summary>
+        <div class="table-wrapper">
+          <table>
+            <tr><th>الفصل الرابع</th><td>محاضرة 1 - الدرس الأول ج1: الطحالب</td></tr>
+            <tr><th>الفصل الرابع</th><td>محاضرة 2 - الدرس الأول ج2: النباتات اللابذرية</td></tr>
+            <tr><th>الفصل الرابع</th><td>محاضرة 3 - الدرس الثاني ج1: النباتات البذرية</td></tr>
+            <tr><th>الفصل الرابع</th><td>محاضرة 4 - النباتات البذرية وأنواعها</td></tr>
+            <tr><th>الفصل الخامس</th><td>محاضرة 1 - اللافقريات (الإسفنجيات + أمعائية الجوف)</td></tr>
+            <tr><th>الفصل الخامس</th><td>محاضرة 2 - اللافقريات (الديدان بأنواعها الثلاثة)</td></tr>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>الأول المتوسط</summary>
+        <div class="table-wrapper">
+          <table>
+            <tr><th>الفصل الخامس</th><td>محاضرة 1 - الإنزيمات</td></tr>
+            <tr><th>الفصل الخامس</th><td>محاضرة 2 - الهرمونات والغدد</td></tr>
+            <tr><th>الفصل الخامس</th><td>محاضرة 3 - الأحياء والطب (الخلايا السرطانية)</td></tr>
+            <tr><th>الفصل السادس</th><td>محاضرة 1 - الدرس الأول: نشأة علم الوراثة</td></tr>
+            <tr><th>الفصل السادس</th><td>محاضرة 2 - الدرس الثاني: الكروموسومات ودورها في الوراثة</td></tr>
+          </table>
+        </div>
+      </details>
     </div>
-  </details>
-</section>
+  </div>
 
-<section class="subject">
-  <div class="subject-header">Biology</div>
+  <div id="math" class="subject-content">
+    <div class="subject-card">
+      <div class="card-header">الرياضيات</div>
 
-  <details>
-    <summary>الصف السادس إعدادي (G12)</summary>
-    <div class="content">
-      <table>
-        <tr><th>الفصل الثالث</th><td>محاضرة 14 المتك وتكوين حبوب اللقاح</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 15 - المبيض وتكوين البيوض في النباتات الزهرية</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 16 - تكوين انبوب اللقاح وعملية الاخصاب وتكوين الجنين</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 17 - تكوين البذرة وانواع التلقيح</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 18 تكوين الثمرة</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 19 الاثمار العذري وتركيب الثمرة وانتشار البذور والثمار</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 20 التكاثر في الحشرات - الذكري</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 21 التكاثر في الحشرات - الانثوي والاخصاب</td></tr>
-      </table>
+      <details open>
+        <summary>السادس العلمي</summary>
+        <div class="table-wrapper">
+          <table>
+            <tr><th>الفصل الثالث</th><td>محاضرة 21 - التقريب (الأسئلة الجبرية) ج2</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 22 - التقريب (الأسئلة الجبرية) ج3</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 23 - التقريب (الأسئلة الجبرية) ج4</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 24 - التقريب (الأسئلة الهندسية) ج1</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 25 - التقريب (الأسئلة الهندسية) ج2</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 26 - التقريب (الأسئلة الهندسية) ج3</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 27 - التزايد والتناقص والنقاط الحرجة والتقعر</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 28 - تكملة التزايد والتناقص والنقاط الحرجة</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 29 - إيجاد الثوابت ج1</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 30 - إيجاد الثوابت ج2</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 31 - إيجاد الثوابت ج3</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 32 - إيجاد الثوابت ج4</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 33 - رسم الدوال (خطوات الحل)</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 34 - رسم الدوال (كثيرة الحدود) ج1</td></tr>
+            <tr><th>الفصل الثالث</th><td>محاضرة 35 - رسم الدوال (كثيرة الحدود) ج2</td></tr>
+          </table>
+        </div>
+      </details>
     </div>
-  </details>
+  </div>
 
-  <details>
-    <summary>الصف الثالث متوسط (G09)</summary>
-    <div class="content">
-      <table>
-        <tr><th>Chapter 6</th><td>Entire Chapter</td></tr>
-        <tr><th>Chapter 7</th><td>Entire Chapter</td></tr>
-      </table>
+  <div id="arabic" class="subject-content">
+    <div class="subject-card">
+      <div class="card-header">اللغة العربية</div>
+
+      <details open>
+        <summary>الثالث المتوسط</summary>
+        <div class="table-wrapper">
+          <table>
+            <tr><th>الفصل السادس</th><td>محاضرة 1 - القواعد: الصفة المشبهة</td></tr>
+            <tr><th>الفصل السادس</th><td>محاضرة 2 - تمرينات الصفة المشبهة</td></tr>
+            <tr><th>الفصل السادس</th><td>محاضرة 3 - الأدب: أبو القاسم الشابي</td></tr>
+            <tr><th>الفصل السابع</th><td>محاضرة 1 - القواعد: اسم المفعول (ج1)</td></tr>
+            <tr><th>الفصل السابع</th><td>محاضرة 2 - القواعد: اسم المفعول (ج2)</td></tr>
+            <tr><th>الفصل السابع</th><td>محاضرة 3 - تمرينات اسم المفعول</td></tr>
+            <tr><th>الفصل السابع</th><td>محاضرة 4 - الأدب: بدر شاكر السياب</td></tr>
+            <tr><th>الفصل الثامن</th><td>محاضرة 1 - القواعد: اسم التفضيل (ج1)</td></tr>
+            <tr><th>الفصل الثامن</th><td>محاضرة 2 - القواعد: اسم التفضيل (ج2)</td></tr>
+            <tr><th>الفصل الثامن</th><td>محاضرة 3 - تمرينات اسم التفضيل</td></tr>
+            <tr><th>الفصل الثامن</th><td>محاضرة 4 - الأدب: بلند الحيدري</td></tr>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>الثاني المتوسط</summary>
+        <div class="table-wrapper">
+          <table>
+            <tr><th>الفصل السادس</th><td>محاضرة 1 - القواعد: المفعول فيه</td></tr>
+            <tr><th>الفصل السادس</th><td>محاضرة 2 - تمرينات المفعول فيه</td></tr>
+            <tr><th>الفصل السادس</th><td>محاضرة 3 - الأدب: فوزي المعلوف</td></tr>
+            <tr><th>الفصل السابع</th><td>محاضرة 1 - القواعد: المفعول المطلق</td></tr>
+            <tr><th>الفصل السابع</th><td>محاضرة 2 - تمرينات المفعول المطلق</td></tr>
+            <tr><th>الفصل الثامن</th><td>محاضرة 1 - القواعد: الحال</td></tr>
+            <tr><th>الفصل الثامن</th><td>محاضرة 2 - تمرينات الحال</td></tr>
+            <tr><th>الفصل الثامن</th><td>محاضرة 3 - الأدب: نازك الملائكة</td></tr>
+            <tr><th>الفصل التاسع</th><td>محاضرة 1 - القواعد: الاستثناء</td></tr>
+            <tr><th>الفصل التاسع</th><td>محاضرة 2 - تمرينات الاستثناء</td></tr>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>الأول المتوسط</summary>
+        <div class="table-wrapper">
+          <table>
+            <tr><th>الفصل التاسع</th><td>محاضرة 1 - القواعد: الفعل الماضي</td></tr>
+            <tr><th>الفصل التاسع</th><td>محاضرة 2 - تمرينات الفعل الماضي</td></tr>
+          </table>
+        </div>
+      </details>
     </div>
-  </details>
+  </div>
 
-  <details>
-    <summary>الصف الثاني متوسط (G08)</summary>
-    <div class="content">
-      <table>
-        <tr><th>الفصل الرابع</th><td>محاضرة 1 - الدرس الاول الجزء الاول الطحالب</td></tr>
-        <tr><th>الفصل الرابع</th><td>محاضرة 2 - الدرس الاول الجزء الثاني النباتات اللابذرية</td></tr>
-        <tr><th>الفصل الرابع</th><td>محاضرة 3 - الدرس الثاني الجزء الاول النباتات البذرية</td></tr>
-        <tr><th>الفصل الرابع</th><td>محاضرة 4 - النباتات البذرية وانواعها</td></tr>
-        <tr><th>الفصل الخامس</th><td>محاضرة 1 - اللافقريات - الاسفنجيات + امعائية الجوف</td></tr>
-        <tr><th>الفصل الخامس</th><td>محاضرة 2 - اللافقريات - الديدان بثلاث انواعها</td></tr>
-      </table>
+  <div id="physics" class="subject-content">
+    <div class="subject-card">
+      <div class="card-header">الفيزياء</div>
+
+      <details open>
+        <summary>الثاني المتوسط</summary>
+        <div class="table-wrapper">
+          <table>
+            <tr><th>الفصل الخامس</th><td>الفصل بالكامل</td></tr>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>الأول المتوسط</summary>
+        <div class="table-wrapper">
+          <table>
+            <tr><th>الفصل الخامس</th><td>محاضرة 2 - تمدد المواد</td></tr>
+            <tr><th>الفصل الخامس</th><td>محاضرة 3 - الانصهار والانجماد</td></tr>
+            <tr><th>الفصل الخامس</th><td>محاضرة 4 - التبخر والغليان</td></tr>
+          </table>
+        </div>
+      </details>
     </div>
-  </details>
+  </div>
 
-  <details>
-    <summary>الصف الأول متوسط (G07)</summary>
-    <div class="content">
-      <table>
-        <tr><th>الفصل الخامس</th><td>محاضرة 1 - اول متوسط الانزيمات</td></tr>
-        <tr><th>الفصل الخامس</th><td>محاضرة 2 - الهورمونات والغدد</td></tr>
-        <tr><th>الفصل الخامس</th><td>محاضرة 3 - الاحياء والطب - الخلايا السرطانية</td></tr>
-        <tr><th>الفصل السادس</th><td>محاضرة 1 - الدرس الاول - نشأة علم الوراثة</td></tr>
-        <tr><th>الفصل السادس</th><td>محاضرة 2 - الدرس الثاني - الكروموسومات ودورها في الوراثة</td></tr>
-      </table>
+  <div id="english" class="subject-content">
+    <div class="subject-card">
+      <div class="card-header">اللغة الإنجليزية</div>
+
+      <details open>
+        <summary>السادس العلمي</summary>
+        <div class="table-wrapper">
+          <table>
+            <tr><th>الوحدة الثالثة</th><td>الوحدة بالكامل (Unit 3)</td></tr>
+          </table>
+        </div>
+      </details>
     </div>
-  </details>
-</section>
-
-<section class="subject">
-  <div class="subject-header">Mathematics</div>
-
-  <details>
-    <summary>الصف السادس إعدادي (G12)</summary>
-    <div class="content">
-      <table>
-        <tr><th>الفصل الثالث</th><td>محاضرة 21 - التقريب (الاسئلة الجبرية) ج2</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 22 - التقريب (الاسئلة الجبرية) ج3</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 23 - التقريب (الاسئلة الجبرية) ج4</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 24 - التقريب (الاسئلة الهندسية) ج1</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 25 - التقريب (الاسئلة الهندسية) ج2</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 26 - التقريب (الاسئلة الهندسية) ج3</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 27 - التزايد والتناقص والنقاط الحرجة والتقعر</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 28 - التزايد والتناقص والنقاط الحرجة والتقعر</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 29 - ايجاد الثوابت ج1</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 30 - ايجاد الثوابت ج2</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 31 - ايجاد الثوابت ج3</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 32 - ايجاد الثوابت ج4</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 33 - رسم الدوال (خطوات الحل)</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 34 - رسم الدوال (كثيرة حدود) ج1</td></tr>
-        <tr><th>الفصل الثالث</th><td>محاضرة 35 - رسم الدوال (كثيرة الحدود)ج2</td></tr>
-      </table>
-    </div>
-  </details>
-</section>
-
-<section class="subject">
-  <div class="subject-header">Arabic</div>
-
-  <details>
-    <summary>الصف الثالث متوسط (G09)</summary>
-    <div class="content">
-      <table>
-        <tr><th>الفصل السادس</th><td>محاضرة 1 - القواعد - الصفة المشبهة</td></tr>
-        <tr><th>الفصل السادس</th><td>محاضرة 2 - تمرينات الصفة المشبهة</td></tr>
-        <tr><th>الفصل السادس</th><td>محاضرة 3 - الأدب - أبو القاسم الشابي</td></tr>
-        <tr><th>الفصل السابع</th><td>محاضرة 1 - القواعد - اسم المفعول -الجزء الأول</td></tr>
-        <tr><th>الفصل السابع</th><td>محاضرة 2 - القواعد - اسم المفعول - الجزء الثاني</td></tr>
-        <tr><th>الفصل السابع</th><td>محاضرة 3 - تمرينات اسم المفعول</td></tr>
-        <tr><th>الفصل السابع</th><td>محاضرة 4 - الأدب - بدر شاكر السياب</td></tr>
-        <tr><th>الفصل الثامن</th><td>محاضرة 1 - القواعد - اسم التفضيل - الجزء الأول</td></tr>
-        <tr><th>الفصل الثامن</th><td>محاضرة 2 - القواعد - اسم التفضيل - الجزء الثاني</td></tr>
-        <tr><th>الفصل الثامن</th><td>محاضرة 3 - تمرينات اسم التفضيل</td></tr>
-        <tr><th>الفصل الثامن</th><td>محاضرة 4 - الأدب - بلند الحيدري</td></tr>
-      </table>
-    </div>
-  </details>
-
-  <details>
-    <summary>الصف الثاني متوسط (G08)</summary>
-    <div class="content">
-      <table>
-        <tr><th>الفصل السادس</th><td>محاضرة 1 - القواعد - المفعول فيه</td></tr>
-        <tr><th>الفصل السادس</th><td>محاضرة 2 - تمرينات المفعول فيه</td></tr>
-        <tr><th>الفصل السادس</th><td>محاضرة 3 - الأدب - فوزي المعلوف</td></tr>
-        <tr><th>الفصل السابع</th><td>محاضرة 1 - القواعد - المفعول المطلق</td></tr>
-        <tr><th>الفصل السابع</th><td>محاضرة 2 - تمرينات المفعول المطلق</td></tr>
-        <tr><th>الفصل الثامن</th><td>محاضرة 1 - الحال</td></tr>
-        <tr><th>الفصل الثامن</th><td>محاضرة 2 - تمرينات الحال</td></tr>
-        <tr><th>الفصل الثامن</th><td>محاضرة 3 - الأدب - نازك الملائكة</td></tr>
-        <tr><th>الفصل التاسع</th><td>محاضرة 1 - القواعد - الاستثناء</td></tr>
-        <tr><th>الفصل التاسع</th><td>محاضرة 2 - تمرينات الاستثناء</td></tr>
-      </table>
-    </div>
-  </details>
-
-  <details>
-    <summary>الصف الأول متوسط (G07)</summary>
-    <div class="content">
-      <table>
-        <tr><th>الفصل التاسع</th><td>محاضرة 1 - القواعد - الفعل الماضي</td></tr>
-        <tr><th>الفصل التاسع</th><td>محاضرة 2 - تمرينات الفعل الماضي</td></tr>
-      </table>
-    </div>
-  </details>
-</section>
-
-<section class="subject">
-  <div class="subject-header">Physics</div>
-
-  <details>
-    <summary>الصف الثاني متوسط (G08)</summary>
-    <div class="content">
-      <table>
-        <tr><th>Chapter 5</th><td>Entire Chapter</td></tr>
-      </table>
-    </div>
-  </details>
-
-  <details>
-    <summary>الصف الأول متوسط (G07)</summary>
-    <div class="content">
-      <table>
-        <tr><th>الفصل الخامس</th><td>محاضرة 2 - تمدد المواد</td></tr>
-        <tr><th>الفصل الخامس</th><td>محاضرة 3 - الانصهار والانجماد</td></tr>
-        <tr><th>الفصل الخامس</th><td>محاضرة 4 - التبخر والغليان</td></tr>
-      </table>
-    </div>
-  </details>
-</section>
-
-<section class="subject">
-  <div class="subject-header">English</div>
-
-  <details>
-    <summary>الصف السادس إعدادي (G12)</summary>
-    <div class="content">
-      <table>
-        <tr><th>Unit 3</th><td>Full Unit Required</td></tr>
-      </table>
-    </div>
-  </details>
-</section>
+  </div>
 
 </div>
+
+<script>
+  function openSubject(subjectId) {
+    // 1. Hide all subject contents
+    const contents = document.querySelectorAll('.subject-content');
+    contents.forEach(content => {
+      content.classList.remove('active-content');
+    });
+
+    // 2. Remove 'active' class from all buttons
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => {
+      btn.classList.remove('active');
+    });
+
+    // 3. Show the selected subject
+    document.getElementById(subjectId).classList.add('active-content');
+
+    // 4. Add 'active' class to the clicked button
+    // Find the button that called this function based on the text or logic, 
+    // or easier: use event.currentTarget if passed, but here we can just loop
+    // Since we are inside the function call from HTML, let's use a simpler approach 
+    // to highlight the button:
+    const clickedBtn = event.target;
+    clickedBtn.classList.add('active');
+  }
+</script>
+
 </body>
 </html>
