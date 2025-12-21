@@ -63,6 +63,17 @@
       color: var(--primary);
       background: linear-gradient(135deg, var(--secondary), #ffffff);
       border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    details {
+      border-bottom: 1px solid var(--border);
+    }
+
+    details:last-child {
+      border-bottom: none;
     }
 
     summary {
@@ -70,10 +81,16 @@
       padding: 16px 22px;
       font-weight: 600;
       background: #fafbff;
+      transition: background 0.2s;
+    }
+
+    summary:hover {
+      background: #f0f4ff;
     }
 
     .content {
       padding: 12px 26px 22px;
+      background: #fff;
     }
 
     table {
@@ -88,8 +105,14 @@
     }
 
     th {
-      width: 180px;
+      width: 160px;
       color: var(--muted);
+      font-weight: 600;
+      background-color: #fcfcfc;
+    }
+    
+    tr:last-child th, tr:last-child td {
+      border-bottom: none;
     }
   </style>
 </head>
@@ -98,14 +121,14 @@
 <div class="container">
 <header>
   <h1>المواد والمحاضرات</h1>
-  <p>قائمة المحاضرات المطلوبة مرتبة حسب المادة</p>
+  <p>قائمة المحاضرات المطلوبة مرتبة حسب المادة والمرحلة الدراسية</p>
 </header>
 
 <section class="subject">
-  <div class="subject-header">Chemisry</div>
+  <div class="subject-header">Chemistry</div>
 
   <details open>
-    <summary>الصف السادس علمي</summary>
+    <summary>الصف السادس إعدادي (G12)</summary>
     <div class="content">
       <table>
         <tr><th>الفصل الرابع</th><td>محاضرة 6 - التعبير عن الخلية كتابة</td></tr>
@@ -116,7 +139,7 @@
   </details>
 
   <details>
-    <summary>الصف الثالث متوسط</summary>
+    <summary>الصف الثالث متوسط (G09)</summary>
     <div class="content">
       <table>
         <tr><th>الفصل السادس</th><td>محاضرة 3 غاز الميثان</td></tr>
@@ -131,10 +154,10 @@
 </section>
 
 <section class="subject">
-  <div class="subject-header">Bio</div>
+  <div class="subject-header">Biology</div>
 
-  <details open>
-    <summary>الصف السادس علمي</summary>
+  <details>
+    <summary>الصف السادس إعدادي (G12)</summary>
     <div class="content">
       <table>
         <tr><th>الفصل الثالث</th><td>محاضرة 14 المتك وتكوين حبوب اللقاح</td></tr>
@@ -150,9 +173,154 @@
   </details>
 
   <details>
-    <summary>الصف الثالث متوسط</summary>
+    <summary>الصف الثالث متوسط (G09)</summary>
     <div class="content">
-      Chapter 6<br>Chapter 7
+      <table>
+        <tr><th>Chapter 6</th><td>Entire Chapter</td></tr>
+        <tr><th>Chapter 7</th><td>Entire Chapter</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>الصف الثاني متوسط (G08)</summary>
+    <div class="content">
+      <table>
+        <tr><th>الفصل الرابع</th><td>محاضرة 1 - الدرس الاول الجزء الاول الطحالب</td></tr>
+        <tr><th>الفصل الرابع</th><td>محاضرة 2 - الدرس الاول الجزء الثاني النباتات اللابذرية</td></tr>
+        <tr><th>الفصل الرابع</th><td>محاضرة 3 - الدرس الثاني الجزء الاول النباتات البذرية</td></tr>
+        <tr><th>الفصل الرابع</th><td>محاضرة 4 - النباتات البذرية وانواعها</td></tr>
+        <tr><th>الفصل الخامس</th><td>محاضرة 1 - اللافقريات - الاسفنجيات + امعائية الجوف</td></tr>
+        <tr><th>الفصل الخامس</th><td>محاضرة 2 - اللافقريات - الديدان بثلاث انواعها</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>الصف الأول متوسط (G07)</summary>
+    <div class="content">
+      <table>
+        <tr><th>الفصل الخامس</th><td>محاضرة 1 - اول متوسط الانزيمات</td></tr>
+        <tr><th>الفصل الخامس</th><td>محاضرة 2 - الهورمونات والغدد</td></tr>
+        <tr><th>الفصل الخامس</th><td>محاضرة 3 - الاحياء والطب - الخلايا السرطانية</td></tr>
+        <tr><th>الفصل السادس</th><td>محاضرة 1 - الدرس الاول - نشأة علم الوراثة</td></tr>
+        <tr><th>الفصل السادس</th><td>محاضرة 2 - الدرس الثاني - الكروموسومات ودورها في الوراثة</td></tr>
+      </table>
+    </div>
+  </details>
+</section>
+
+<section class="subject">
+  <div class="subject-header">Mathematics</div>
+
+  <details>
+    <summary>الصف السادس إعدادي (G12)</summary>
+    <div class="content">
+      <table>
+        <tr><th>الفصل الثالث</th><td>محاضرة 21 - التقريب (الاسئلة الجبرية) ج2</td></tr>
+        <tr><th>الفصل الثالث</th><td>محاضرة 22 - التقريب (الاسئلة الجبرية) ج3</td></tr>
+        <tr><th>الفصل الثالث</th><td>محاضرة 23 - التقريب (الاسئلة الجبرية) ج4</td></tr>
+        <tr><th>الفصل الثالث</th><td>محاضرة 24 - التقريب (الاسئلة الهندسية) ج1</td></tr>
+        <tr><th>الفصل الثالث</th><td>محاضرة 25 - التقريب (الاسئلة الهندسية) ج2</td></tr>
+        <tr><th>الفصل الثالث</th><td>محاضرة 26 - التقريب (الاسئلة الهندسية) ج3</td></tr>
+        <tr><th>الفصل الثالث</th><td>محاضرة 27 - التزايد والتناقص والنقاط الحرجة والتقعر</td></tr>
+        <tr><th>الفصل الثالث</th><td>محاضرة 28 - التزايد والتناقص والنقاط الحرجة والتقعر</td></tr>
+        <tr><th>الفصل الثالث</th><td>محاضرة 29 - ايجاد الثوابت ج1</td></tr>
+        <tr><th>الفصل الثالث</th><td>محاضرة 30 - ايجاد الثوابت ج2</td></tr>
+        <tr><th>الفصل الثالث</th><td>محاضرة 31 - ايجاد الثوابت ج3</td></tr>
+        <tr><th>الفصل الثالث</th><td>محاضرة 32 - ايجاد الثوابت ج4</td></tr>
+        <tr><th>الفصل الثالث</th><td>محاضرة 33 - رسم الدوال (خطوات الحل)</td></tr>
+        <tr><th>الفصل الثالث</th><td>محاضرة 34 - رسم الدوال (كثيرة حدود) ج1</td></tr>
+        <tr><th>الفصل الثالث</th><td>محاضرة 35 - رسم الدوال (كثيرة الحدود)ج2</td></tr>
+      </table>
+    </div>
+  </details>
+</section>
+
+<section class="subject">
+  <div class="subject-header">Arabic</div>
+
+  <details>
+    <summary>الصف الثالث متوسط (G09)</summary>
+    <div class="content">
+      <table>
+        <tr><th>الفصل السادس</th><td>محاضرة 1 - القواعد - الصفة المشبهة</td></tr>
+        <tr><th>الفصل السادس</th><td>محاضرة 2 - تمرينات الصفة المشبهة</td></tr>
+        <tr><th>الفصل السادس</th><td>محاضرة 3 - الأدب - أبو القاسم الشابي</td></tr>
+        <tr><th>الفصل السابع</th><td>محاضرة 1 - القواعد - اسم المفعول -الجزء الأول</td></tr>
+        <tr><th>الفصل السابع</th><td>محاضرة 2 - القواعد - اسم المفعول - الجزء الثاني</td></tr>
+        <tr><th>الفصل السابع</th><td>محاضرة 3 - تمرينات اسم المفعول</td></tr>
+        <tr><th>الفصل السابع</th><td>محاضرة 4 - الأدب - بدر شاكر السياب</td></tr>
+        <tr><th>الفصل الثامن</th><td>محاضرة 1 - القواعد - اسم التفضيل - الجزء الأول</td></tr>
+        <tr><th>الفصل الثامن</th><td>محاضرة 2 - القواعد - اسم التفضيل - الجزء الثاني</td></tr>
+        <tr><th>الفصل الثامن</th><td>محاضرة 3 - تمرينات اسم التفضيل</td></tr>
+        <tr><th>الفصل الثامن</th><td>محاضرة 4 - الأدب - بلند الحيدري</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>الصف الثاني متوسط (G08)</summary>
+    <div class="content">
+      <table>
+        <tr><th>الفصل السادس</th><td>محاضرة 1 - القواعد - المفعول فيه</td></tr>
+        <tr><th>الفصل السادس</th><td>محاضرة 2 - تمرينات المفعول فيه</td></tr>
+        <tr><th>الفصل السادس</th><td>محاضرة 3 - الأدب - فوزي المعلوف</td></tr>
+        <tr><th>الفصل السابع</th><td>محاضرة 1 - القواعد - المفعول المطلق</td></tr>
+        <tr><th>الفصل السابع</th><td>محاضرة 2 - تمرينات المفعول المطلق</td></tr>
+        <tr><th>الفصل الثامن</th><td>محاضرة 1 - الحال</td></tr>
+        <tr><th>الفصل الثامن</th><td>محاضرة 2 - تمرينات الحال</td></tr>
+        <tr><th>الفصل الثامن</th><td>محاضرة 3 - الأدب - نازك الملائكة</td></tr>
+        <tr><th>الفصل التاسع</th><td>محاضرة 1 - القواعد - الاستثناء</td></tr>
+        <tr><th>الفصل التاسع</th><td>محاضرة 2 - تمرينات الاستثناء</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>الصف الأول متوسط (G07)</summary>
+    <div class="content">
+      <table>
+        <tr><th>الفصل التاسع</th><td>محاضرة 1 - القواعد - الفعل الماضي</td></tr>
+        <tr><th>الفصل التاسع</th><td>محاضرة 2 - تمرينات الفعل الماضي</td></tr>
+      </table>
+    </div>
+  </details>
+</section>
+
+<section class="subject">
+  <div class="subject-header">Physics</div>
+
+  <details>
+    <summary>الصف الثاني متوسط (G08)</summary>
+    <div class="content">
+      <table>
+        <tr><th>Chapter 5</th><td>Entire Chapter</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>الصف الأول متوسط (G07)</summary>
+    <div class="content">
+      <table>
+        <tr><th>الفصل الخامس</th><td>محاضرة 2 - تمدد المواد</td></tr>
+        <tr><th>الفصل الخامس</th><td>محاضرة 3 - الانصهار والانجماد</td></tr>
+        <tr><th>الفصل الخامس</th><td>محاضرة 4 - التبخر والغليان</td></tr>
+      </table>
+    </div>
+  </details>
+</section>
+
+<section class="subject">
+  <div class="subject-header">English</div>
+
+  <details>
+    <summary>الصف السادس إعدادي (G12)</summary>
+    <div class="content">
+      <table>
+        <tr><th>Unit 3</th><td>Full Unit Required</td></tr>
+      </table>
     </div>
   </details>
 </section>
