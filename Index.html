@@ -202,28 +202,63 @@
     });
   }
 
-  // 4. Handle "Mark as Uploaded"
+// 4. Handle "Mark as Uploaded" with UI Cleanup
   window.markAsUploaded = async function(id, subject, btnElement) {
-    // UI Update immediately (Optimistic UI)
-    btnElement.classList.add('uploading');
+    // 1. Optimistic UI: Update button immediately
     btnElement.innerText = 'جار الحفظ...';
+    btnElement.classList.add('uploading');
 
-    // Send to Google Sheets
-    try {
-      await fetch(API_URL, {
-        method: 'POST',
-        mode: 'no-cors', // Important for simple GAS calls
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ id: id, subject: subject })
-      });
+    // 2. Identify the row and table parts
+    const row = document.getElementById(`row-${id}`);
+    const tbody = row.parentElement; // The <tbody> tag
+    const tableWrapper = tbody.closest('.table-wrapper'); // The div wrapping the table
+    const detailsTag = tableWrapper.parentElement; // The <details> tag
+    const subjectCard = detailsTag.parentElement; // The main card
 
-      // On Success: Remove row visually
-      const row = document.getElementById(`row-${id}`);
-      if (row) {
-        row.classList.add('fade-out');
-        setTimeout(() => row.remove(), 500); // Remove from DOM after animation
+    // 3. Send to Google Sheets (Fire and Forget)
+    // We don't await this strictly for the UI removal to feel instant, 
+    // but we send it first to ensure the request goes out.
+    fetch(API_URL, {
+      method: 'POST',
+      mode: 'no-cors', 
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ id: id, subject: subject })
+    }).catch(err => console.error(err));
+
+    // 4. Animate and Remove
+    row.classList.add('fade-out');
+    
+    // Wait 500ms for animation to finish, then remove logic
+    setTimeout(() => {
+      row.remove();
+
+      // CHECK 1: Is the table empty?
+      // (tbody children count should be 0)
+      if (tbody.children.length === 0) {
+        // Animate closing the details
+        detailsTag.style.opacity = '0';
+        setTimeout(() => {
+            detailsTag.remove();
+            
+            // CHECK 2: Is the Subject Card empty?
+            // We check if there are any <details> tags left in this card
+            const remainingDetails = subjectCard.querySelectorAll('details');
+            if (remainingDetails.length === 0) {
+                // Determine the subject name to show nice message
+                const headerText = subjectCard.querySelector('.card-header').innerText;
+                subjectCard.innerHTML = `
+                    <div class="card-header">${headerText}</div>
+                    <div class="empty-state">
+                        <span style="font-size:30px;">🎉</span><br>
+                        عاش، كل محاضرات ${headerText} مرفوعة!
+                    </div>
+                `;
+            }
+        }, 300);
       }
-
+    }, 500);
+  };
+  
     } catch (error) {
       console.error('Error updating:', error);
       btnElement.classList.remove('uploading');
