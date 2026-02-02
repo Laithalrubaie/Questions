@@ -5,104 +5,53 @@
   <title>نظام متابعة المحاضرات</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-
   <style>
-    :root {
-      --bg: #f4f6fb;
-      --card: #ffffff;
-      --primary: #2f3a8f;
-      --secondary: #e9ecff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --border: #e5e7eb;
-      --radius: 14px;
-      --success: #10b981;
-    }
-
-    body { margin: 0; font-family: "Cairo", system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    /* ... Previous CSS remains the same ... */
+    :root { --bg: #f4f6fb; --card: #ffffff; --primary: #2f3a8f; --secondary: #e9ecff; --text: #1f2937; --muted: #6b7280; --border: #e5e7eb; --radius: 14px; --success: #10b981; }
+    body { margin: 0; font-family: "Cairo", sans-serif; background: var(--bg); color: var(--text); }
     .container { max-width: 1100px; margin: auto; padding: 32px 20px 60px; }
-    
     header { text-align: center; margin-bottom: 30px; }
-    header h1 { margin: 0 0 10px; color: var(--primary); }
-    header p { color: var(--muted); margin: 0; }
-
-    /* Tabs */
-    .tabs-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px; background: #fff; padding: 15px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    .tab-btn { background: transparent; border: 2px solid var(--secondary); color: var(--muted); padding: 8px 16px; border-radius: 50px; font-family: "Cairo", sans-serif; font-weight: 700; cursor: pointer; transition: all 0.3s ease; }
-    .tab-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .tabs-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px; background: #fff; padding: 15px; border-radius: var(--radius); }
+    .tab-btn { background: transparent; border: 2px solid var(--secondary); color: var(--muted); padding: 8px 16px; border-radius: 50px; font-family: "Cairo"; font-weight: 700; cursor: pointer; }
     .tab-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
-
-    /* Content Area */
-    #content-area { min-height: 300px; position: relative; }
-    
-    /* Loading Spinner */
-    .loader { display: none; position: absolute; top: 50px; left: 50%; transform: translateX(-50%); }
-    .loader.active { display: block; }
-    .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    /* Subject Cards */
-    .subject-content { display: none; animation: fadeIn 0.4s ease-in-out; }
-    .subject-content.active-content { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
+    .subject-content { display: none; }
+    .active-content { display: block; }
     .subject-card { background: var(--card); border-radius: var(--radius); margin-bottom: 20px; border: 1px solid var(--border); overflow: hidden; }
-    .card-header { padding: 15px 20px; font-size: 20px; font-weight: 700; color: var(--primary); background: linear-gradient(135deg, var(--secondary), #ffffff); border-bottom: 1px solid var(--border); }
-
-    /* Details/Summary */
-    details { border-bottom: 1px solid var(--border); transition: all 0.3s ease; }
-    details:last-child { border-bottom: none; }
-    summary { cursor: pointer; padding: 15px 20px; font-weight: 600; background: #fafbff; display: flex; justify-content: space-between; align-items: center; list-style: none; }
-    summary::-webkit-details-marker { display: none; }
-    summary:hover { background: #f0f4ff; }
-    summary::after { content: '+'; font-size: 18px; color: var(--primary); }
-    details[open] summary::after { content: '-'; }
-
-    /* Tables */
-    .table-wrapper { padding: 0; background: #fff; overflow-x: auto; }
+    .card-header { padding: 15px 20px; font-weight: 700; color: var(--primary); background: linear-gradient(135deg, var(--secondary), #ffffff); border-bottom: 1px solid var(--border); }
+    details { border-bottom: 1px solid var(--border); }
+    summary { cursor: pointer; padding: 15px 20px; font-weight: 600; display: flex; justify-content: space-between; }
     table { width: 100%; border-collapse: collapse; min-width: 500px; }
     th, td { padding: 14px 20px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    th.chapter-col { width: 25%; text-align: right; color: var(--primary); background-color: #fcfcfc; font-size: 0.9rem; }
-    td.desc-col { text-align: right; font-weight: 500; }
-    th.status-col { width: 140px; text-align: center; color: var(--muted); }
-    td.status-cell { text-align: center; }
-
-    /* Button Style for Upload */
-    .upload-btn {
-      background-color: var(--secondary);
-      color: var(--primary);
-      border: 1px solid transparent;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-family: inherit;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 0.85rem;
-    }
-    .upload-btn:hover { background-color: var(--primary); color: white; transform: scale(1.02); }
-    .upload-btn.uploading { opacity: 0.7; cursor: wait; pointer-events: none; }
+    th.chapter-col { width: 25%; color: var(--primary); background: #fcfcfc; }
+    .upload-btn { background: var(--secondary); color: var(--primary); border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: "Cairo"; font-weight: bold; }
+    .upload-btn:hover { background: var(--primary); color: white; }
+    .table-wrapper { overflow-x: auto; }
     
-    /* Animation for removal */
-    .fade-out { animation: fadeOutRight 0.5s forwards; }
-    @keyframes fadeOutRight { to { opacity: 0; transform: translateX(-20px); height: 0; padding: 0; border: none; } }
-
-    /* Empty State */
-    .empty-state { padding: 40px; text-align: center; color: var(--muted); font-style: italic; }
-
-    @media (max-width: 600px) {
-      .tabs-container { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding-bottom: 10px; }
-      .tab-btn { white-space: nowrap; flex: 0 0 auto; }
-      th.chapter-col { width: 30%; font-size: 12px; }
-    }
+    /* MODAL STYLES (NEW) */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-overlay.open { display: flex; }
+    .modal-card { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; }
+    .modal-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 20px; color: var(--primary); }
+    .file-drop-area { border: 2px dashed var(--secondary); padding: 30px; text-align: center; border-radius: 10px; margin-bottom: 20px; cursor: pointer; transition: 0.3s; }
+    .file-drop-area:hover { border-color: var(--primary); background: #fafbff; }
+    .file-input { display: none; }
+    .file-list { margin-bottom: 20px; max-height: 150px; overflow-y: auto; font-size: 0.9rem; }
+    .file-item { display: flex; justify-content: space-between; padding: 8px; background: #f8f9fa; margin-bottom: 5px; border-radius: 6px; }
+    .modal-actions { display: flex; gap: 10px; }
+    .btn-submit { flex: 2; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-family: "Cairo"; font-weight: bold; cursor: pointer; }
+    .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+    .btn-cancel { flex: 1; background: transparent; border: 1px solid #ddd; color: #666; border-radius: 10px; cursor: pointer; font-family: "Cairo"; }
+    
+    .spinner { width: 20px; height: 20px; border: 3px solid #ffffff33; border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
-
 <body>
+
 <div class="container">
   <header>
     <h1>متابعة رفع الأسئلة</h1>
-    <p>نظام المزامنة مع جداول البيانات</p>
+    <p>نظام المزامنة ورفع الملفات</p>
   </header>
 
   <div class="tabs-container">
@@ -114,173 +63,161 @@
     <button class="tab-btn" onclick="switchTab('english')">English</button>
   </div>
 
-  <div id="loader" class="loader active"><div class="spinner"></div></div>
+  <div id="content-area">Loading...</div>
+</div>
 
-  <div id="content-area"></div>
-
+<div class="modal-overlay" id="uploadModal">
+  <div class="modal-card">
+    <div class="modal-title">رفع ملفات المحاضرة</div>
+    <div id="modalSubtitle" style="margin-bottom:15px; font-size:0.9rem; color:#666;"></div>
+    
+    <div class="file-drop-area" onclick="document.getElementById('fileInput').click()">
+      <span style="font-size:24px">📂</span><br>
+      اضغط لاختيار الملفات<br>
+      <span style="font-size:12px; color:#999">PDF, Images, Word</span>
+    </div>
+    <input type="file" id="fileInput" class="file-input" multiple onchange="handleFileSelect(this)">
+    
+    <div class="file-list" id="fileList"></div>
+    
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
+      <button class="btn-submit" id="submitBtn" onclick="submitUpload()">تأكيد الرفع</button>
+    </div>
+  </div>
 </div>
 
 <script>
-  // ---------------------------------------------------------
-  // CONFIGURATION: PASTE YOUR GOOGLE SCRIPT WEB APP URL HERE
-  // ---------------------------------------------------------
+  // ------------------------------------
   const API_URL = "https://script.google.com/macros/s/AKfycbxfek5s23iGr3mH-nIP_WrYBCsDRRLijKBvfsmIprtnnX3gSBrOQLlm3lRPAv2npidv/exec"; 
-  // ---------------------------------------------------------
+  // ------------------------------------
 
-  let globalData = {};
+  let currentUpload = { id: null, subject: null, files: [] };
 
-  // 1. Initial Load
-  document.addEventListener('DOMContentLoaded', () => {
-    fetchData();
-  });
+  document.addEventListener('DOMContentLoaded', fetchData);
 
-  // 2. Fetch Data from Google Sheets
   async function fetchData() {
     try {
-      const response = await fetch(API_URL);
-      const data = await response.json();
-      globalData = data;
-      renderAllSubjects(data);
-      document.getElementById('loader').classList.remove('active');
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      document.getElementById('content-area').innerHTML = `<div class="empty-state">حدث خطأ في تحميل البيانات. يرجى المحاولة لاحقاً.</div>`;
-    }
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      renderAll(data);
+    } catch(e) { document.getElementById('content-area').innerHTML = "Error loading data."; }
   }
 
-  // 3. Render Logic
-  function renderAllSubjects(data) {
+  function renderAll(data) {
     const container = document.getElementById('content-area');
     container.innerHTML = '';
-
-    const subjects = ['chemistry', 'biology', 'math', 'arabic', 'physics', 'english'];
-    const subjectTitles = {
-      'chemistry': 'الكيمياء', 'biology': 'الأحياء', 'math': 'الرياضيات', 
-      'arabic': 'اللغة العربية', 'physics': 'الفيزياء', 'english': 'اللغة الإنجليزية'
-    };
-
-    subjects.forEach((subj, index) => {
-      const isActive = index === 0 ? 'active-content' : '';
-      const subjData = data[subj]; // Object grouped by Grade
-
-      let html = `<div id="${subj}" class="subject-content ${isActive}">
-                    <div class="subject-card">
-                      <div class="card-header">${subjectTitles[subj]}</div>`;
-
-      if (!subjData || Object.keys(subjData).length === 0) {
-        html += `<div class="empty-state">🎉 جميع المحاضرات تم رفعها!</div>`;
+    const map = { 'chemistry': 'الكيمياء', 'biology': 'الأحياء', 'math': 'الرياضيات', 'arabic': 'اللغة العربية', 'physics': 'الفيزياء', 'english': 'اللغة الإنجليزية' };
+    
+    Object.keys(map).forEach((subj, idx) => {
+      let html = `<div id="${subj}" class="subject-content ${idx===0?'active-content':''}">
+        <div class="subject-card"><div class="card-header">${map[subj]}</div>`;
+      
+      if(!data[subj] || Object.keys(data[subj]).length === 0) {
+        html += `<div style="padding:40px; text-align:center; color:#888">تم رفع كل شيء! 🎉</div>`;
       } else {
-        // Iterate over Grades (G12, G09, etc.)
-        for (const [grade, lectures] of Object.entries(subjData)) {
-          html += `
-            <details open>
-              <summary>${grade}</summary>
-              <div class="table-wrapper">
-                <table>
-                  <thead><tr><th class="chapter-col">الفصل</th><th class="desc-col">المحاضرة</th><th class="status-col">إجراء</th></tr></thead>
-                  <tbody>
-                    ${lectures.map(lec => `
-                      <tr id="row-${lec.id}">
-                        <td class="chapter-col">${lec.chapter}</td>
-                        <td class="desc-col">${lec.lecture}</td>
-                        <td class="status-cell">
-                          <button class="upload-btn" onclick="markAsUploaded('${lec.id}', '${subj}', this)">
-                            تم الرفع
-                          </button>
-                        </td>
-                      </tr>
-                    `).join('')}
-                  </tbody>
-                </table>
-              </div>
-            </details>`;
+        for(const [grade, lecs] of Object.entries(data[subj])) {
+          html += `<details open><summary>${grade}</summary><div class="table-wrapper"><table>
+            <thead><tr><th class="chapter-col">الفصل</th><th>المحاضرة</th><th style="width:100px">إجراء</th></tr></thead><tbody>
+            ${lecs.map(l => `
+              <tr id="row-${l.id}">
+                <td class="chapter-col">${l.chapter}</td>
+                <td>${l.lecture}</td>
+                <td style="text-align:center">
+                  <button class="upload-btn" onclick="openUploadModal('${l.id}', '${subj}', '${l.lecture}')">رفع</button>
+                </td>
+              </tr>`).join('')}
+            </tbody></table></div></details>`;
         }
       }
-
       html += `</div></div>`;
       container.insertAdjacentHTML('beforeend', html);
     });
   }
 
-// 4. Handle "Mark as Uploaded" with UI Cleanup
-  window.markAsUploaded = async function(id, subject, btnElement) {
-    // 1. Optimistic UI: Update button immediately
-    btnElement.innerText = 'جار الحفظ...';
-    btnElement.classList.add('uploading');
+  // --- MODAL & FILE HANDLING ---
 
-    // 2. Identify the row and table parts
-    const row = document.getElementById(`row-${id}`);
-    const tbody = row.parentElement; // The <tbody> tag
-    const tableWrapper = tbody.closest('.table-wrapper'); // The div wrapping the table
-    const detailsTag = tableWrapper.parentElement; // The <details> tag
-    const subjectCard = detailsTag.parentElement; // The main card
+  window.openUploadModal = function(id, subject, title) {
+    currentUpload = { id, subject, files: [] };
+    document.getElementById('modalSubtitle').innerText = title;
+    document.getElementById('fileList').innerHTML = '';
+    document.getElementById('fileInput').value = ''; // Reset input
+    document.getElementById('uploadModal').classList.add('open');
+  }
 
-    // 3. Send to Google Sheets (Fire and Forget)
-    // We don't await this strictly for the UI removal to feel instant, 
-    // but we send it first to ensure the request goes out.
-    fetch(API_URL, {
-      method: 'POST',
-      mode: 'no-cors', 
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ id: id, subject: subject })
-    }).catch(err => console.error(err));
+  window.closeModal = function() {
+    document.getElementById('uploadModal').classList.remove('open');
+  }
 
-    // 4. Animate and Remove
-    row.classList.add('fade-out');
+  window.handleFileSelect = function(input) {
+    const list = document.getElementById('fileList');
+    list.innerHTML = ''; // Clear preview
+    currentUpload.files = []; // Clear data
+
+    Array.from(input.files).forEach(file => {
+      // Create Reader
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        // Remove "data:*/*;base64," prefix for GAS
+        const base64Data = e.target.result.split(',')[1]; 
+        currentUpload.files.push({
+          name: file.name,
+          mimeType: file.type,
+          data: base64Data
+        });
+      };
+      reader.readAsDataURL(file);
+
+      // UI Preview
+      const item = document.createElement('div');
+      item.className = 'file-item';
+      item.innerText = `📄 ${file.name}`;
+      list.appendChild(item);
+    });
+  }
+
+  window.submitUpload = async function() {
+    const btn = document.getElementById('submitBtn');
     
-    // Wait 500ms for animation to finish, then remove logic
-    setTimeout(() => {
-      row.remove();
+    // Check if files are selected (Optional - remove if you allow upload without files)
+    // if(currentUpload.files.length === 0) { alert("Please select a file"); return; }
 
-      // CHECK 1: Is the table empty?
-      // (tbody children count should be 0)
-      if (tbody.children.length === 0) {
-        // Animate closing the details
-        detailsTag.style.opacity = '0';
-        setTimeout(() => {
-            detailsTag.remove();
-            
-            // CHECK 2: Is the Subject Card empty?
-            // We check if there are any <details> tags left in this card
-            const remainingDetails = subjectCard.querySelectorAll('details');
-            if (remainingDetails.length === 0) {
-                // Determine the subject name to show nice message
-                const headerText = subjectCard.querySelector('.card-header').innerText;
-                subjectCard.innerHTML = `
-                    <div class="card-header">${headerText}</div>
-                    <div class="empty-state">
-                        <span style="font-size:30px;">🎉</span><br>
-                        عاش، كل محاضرات ${headerText} مرفوعة!
-                    </div>
-                `;
-            }
-        }, 300);
+    btn.innerHTML = '<div class="spinner"></div>';
+    btn.disabled = true;
+
+    try {
+      await fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(currentUpload)
+      });
+
+      // Optimistic Success
+      closeModal();
+      btn.innerHTML = 'تأكيد الرفع';
+      btn.disabled = false;
+      
+      // Remove row
+      const row = document.getElementById(`row-${currentUpload.id}`);
+      if(row) {
+        row.style.background = '#e6fffa';
+        setTimeout(() => row.remove(), 500);
       }
-    }, 500);
-  };
-  
-    } catch (error) {
-      console.error('Error updating:', error);
-      btnElement.classList.remove('uploading');
-      btnElement.innerText = 'خطأ! حاول مجدداً';
+
+    } catch (err) {
+      alert("Error uploading. Try again.");
+      btn.innerHTML = 'تأكيد الرفع';
+      btn.disabled = false;
     }
-  };
+  }
 
-  // 5. Tab Switching
-  window.switchTab = function(subjectId) {
-    // Hide all contents
+  window.switchTab = function(id) {
     document.querySelectorAll('.subject-content').forEach(c => c.classList.remove('active-content'));
-    // Deactivate all buttons
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    
-    // Show selected
-    const content = document.getElementById(subjectId);
-    if(content) content.classList.add('active-content');
-    
-    // Activate button
+    document.getElementById(id).classList.add('active-content');
     event.target.classList.add('active');
-  };
+  }
 </script>
-
 </body>
 </html>
