@@ -93,82 +93,133 @@
 
 <script>
   // ------------------------------------
-  // IMPORTANT: Ensure no spaces are in this URL
+  // CONFIGURATION
+  // ------------------------------------
   const API_URL = "https://script.google.com/macros/s/AKfycbx0_Hmdm2gucB87juLA_Rmzt1x8iL-ewnu3MsSf0SnEZQxqmN0e0I_1aktk_vw4j9kN/exec";
   // ------------------------------------
 
   let currentUpload = { id: null, subject: null, files: [] };
 
+  // Start the app
   document.addEventListener('DOMContentLoaded', fetchData);
 
   async function fetchData() {
-    console.log("Start fetching data...");
     try {
+      console.log("Fetching data...");
       const res = await fetch(API_URL);
-      console.log("Response received from Google:", res);
-      
       const data = await res.json();
-      console.log("Data parsed:", data);
-      
+      console.log("Data loaded:", data);
       renderAll(data);
-    } catch(e) { 
-        console.error("Error:", e);
-        document.getElementById('content-area').innerHTML = `
-            <div style="text-align:center; color:red; padding:20px;">
-                <b>حدث خطأ أثناء التحميل</b><br>
-                ${e.message}<br>
-                <button onclick="location.reload()" style="margin-top:10px; padding:5px 10px;">إعادة المحاولة</button>
-            </div>`; 
+    } catch(e) {
+      console.error(e);
+      document.getElementById('content-area').innerHTML = `
+        <div style="text-align:center; color:red; padding:30px;">
+           حدث خطأ في الاتصال بالسيرفر. تأكد من الإنترنت.<br>
+           <button onclick="location.reload()" style="margin-top:10px;">إعادة المحاولة</button>
+        </div>`;
     }
   }
 
   function renderAll(data) {
     const container = document.getElementById('content-area');
     container.innerHTML = '';
-    const map = { 'chemistry': 'الكيمياء', 'biology': 'الأحياء', 'math': 'الرياضيات', 'arabic': 'اللغة العربية', 'physics': 'الفيزياء', 'english': 'اللغة الإنجليزية' };
+
+    const subjectMap = { 
+      'chemistry': 'الكيمياء', 
+      'biology': 'الأحياء', 
+      'math': 'الرياضيات', 
+      'arabic': 'اللغة العربية', 
+      'physics': 'الفيزياء', 
+      'english': 'اللغة الإنجليزية' 
+    };
     
-    Object.keys(map).forEach((subj, idx) => {
-      let html = `<div id="${subj}" class="subject-content ${idx===0?'active-content':''}">
-        <div class="subject-card"><div class="card-header">${map[subj]}</div>`;
+    const subjects = Object.keys(subjectMap);
+
+    // Loop through each subject
+    subjects.forEach((subj, index) => {
+      // Create the main card structure
+      const subjectName = subjectMap[subj];
+      const isActive = (index === 0) ? 'active-content' : '';
       
-      if(!data[subj] || Object.keys(data[subj]).length === 0) {
-        html += `<div style="padding:40px; text-align:center; color:#888">
-                    <span style="font-size:30px;">🎉</span><br>
-                    تم رفع كل محاضرات ${map[subj]}!
-                 </div>`;
+      const cardDiv = document.createElement('div');
+      cardDiv.id = subj;
+      cardDiv.className = `subject-content ${isActive}`;
+      
+      let cardHTML = `
+        <div class="subject-card">
+          <div class="card-header">${subjectName}</div>
+      `;
+
+      const subjectData = data[subj];
+
+      // CHECK: Is this subject empty?
+      if (!subjectData || Object.keys(subjectData).length === 0) {
+        cardHTML += `
+          <div style="padding:40px; text-align:center; color:#888;">
+             <span style="font-size:30px;">🎉</span><br>
+             تم رفع كل محاضرات ${subjectName}!
+          </div>`;
       } else {
-        for(const [grade, lecs] of Object.entries(data[subj])) {
-          html += `<details open><summary>${grade}</summary><div class="table-wrapper"><table>
-            <thead><tr><th class="chapter-col">الفصل</th><th>المحاضرة</th><th style="width:100px">إجراء</th></tr></thead><tbody>
-            ${lecs.map(l => `
+        // Loop through Grades (G12, G09, etc.)
+        for (const [grade, lectures] of Object.entries(subjectData)) {
+          
+          // Build rows for this grade
+          let rowsHTML = '';
+          lectures.forEach(l => {
+            rowsHTML += `
               <tr id="row-${l.id}">
                 <td class="chapter-col">${l.chapter}</td>
                 <td>${l.lecture}</td>
                 <td style="text-align:center">
                   <button class="upload-btn" onclick="openUploadModal('${l.id}', '${subj}', '${l.lecture}')">رفع</button>
                 </td>
-              </tr>`).join('')}
-            </tbody></table></div></details>`;
+              </tr>
+            `;
+          });
+
+          // Add the grade section (Details/Table)
+          cardHTML += `
+            <details open>
+              <summary>${grade}</summary>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="chapter-col">الفصل</th>
+                      <th>المحاضرة</th>
+                      <th style="width:100px">إجراء</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${rowsHTML}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          `;
         }
       }
-      html += `</div></div>`;
-      container.insertAdjacentHTML('beforeend', html);
+
+      cardHTML += `</div></div>`; // Close card and subject-content
+      cardDiv.innerHTML = cardHTML;
+      container.appendChild(cardDiv);
     });
   }
 
-  // --- MODAL & FILE HANDLING ---
+  // --- UPLOAD & MODAL LOGIC ---
 
   window.openUploadModal = function(id, subject, title) {
-    currentUpload = { id, subject, files: [] };
+    currentUpload = { id: id, subject: subject, files: [] };
+    
     document.getElementById('modalSubtitle').innerText = title;
     document.getElementById('fileList').innerHTML = '';
     document.getElementById('fileInput').value = ''; 
     document.getElementById('uploadModal').classList.add('open');
-  }
+  };
 
   window.closeModal = function() {
     document.getElementById('uploadModal').classList.remove('open');
-  }
+  };
 
   window.handleFileSelect = function(input) {
     const list = document.getElementById('fileList');
@@ -192,7 +243,7 @@
       item.innerText = `📄 ${file.name}`;
       list.appendChild(item);
     });
-  }
+  };
 
   window.submitUpload = async function() {
     const btn = document.getElementById('submitBtn');
@@ -217,6 +268,7 @@
       btn.innerHTML = 'تأكيد الرفع';
       btn.disabled = false;
       
+      // Animate Removal
       const row = document.getElementById(`row-${currentUpload.id}`);
       if(row) {
         row.style.transition = 'all 0.5s';
@@ -227,6 +279,7 @@
           const tbody = row.parentElement;
           row.remove();
 
+          // 1. Check if table is empty
           if (tbody.children.length === 0) {
              const tableWrapper = tbody.closest('.table-wrapper');
              const details = tableWrapper.parentElement; 
@@ -234,33 +287,38 @@
              
              details.remove();
 
+             // 2. Check if Subject is empty
              if (subjectCard.querySelectorAll('details').length === 0) {
                  const headerText = subjectCard.querySelector('.card-header').innerText;
-                 subjectCard.innerHTML = `
-                    <div class="card-header">${headerText}</div>
-                    <div style="padding:40px; text-align:center; color:#888; animation: fadeIn 0.5s;">
-                        <span style="font-size:30px;">🎉</span><br>
-                        عاش، تم رفع كل محاضرات ${headerText}!
-                    </div>
-                 `;
+                 // Inject Success Message
+                 const successMsg = document.createElement('div');
+                 successMsg.style.padding = '40px';
+                 successMsg.style.textAlign = 'center';
+                 successMsg.style.color = '#888';
+                 successMsg.innerHTML = `<span style="font-size:30px;">🎉</span><br>عاش، تم رفع كل محاضرات ${headerText}!`;
+                 subjectCard.appendChild(successMsg);
              }
           }
         }, 500);
       }
 
     } catch (err) {
+      console.error(err);
       alert("حدث خطأ في الرفع، يرجى المحاولة مرة أخرى");
       btn.innerHTML = 'تأكيد الرفع';
       btn.disabled = false;
     }
-  }
+  };
 
   window.switchTab = function(id) {
     document.querySelectorAll('.subject-content').forEach(c => c.classList.remove('active-content'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(id).classList.add('active-content');
-    event.target.classList.add('active');
-  }
+    
+    const activeDiv = document.getElementById(id);
+    if(activeDiv) activeDiv.classList.add('active-content');
+    
+    if(event && event.target) event.target.classList.add('active');
+  };
 </script>
 </body>
 </html>
