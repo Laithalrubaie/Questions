@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* ... Previous CSS remains the same ... */
     :root { --bg: #f4f6fb; --card: #ffffff; --primary: #2f3a8f; --secondary: #e9ecff; --text: #1f2937; --muted: #6b7280; --border: #e5e7eb; --radius: 14px; --success: #10b981; }
     body { margin: 0; font-family: "Cairo", sans-serif; background: var(--bg); color: var(--text); }
     .container { max-width: 1100px; margin: auto; padding: 32px 20px 60px; }
@@ -27,7 +26,7 @@
     .upload-btn:hover { background: var(--primary); color: white; }
     .table-wrapper { overflow-x: auto; }
     
-    /* MODAL STYLES (NEW) */
+    /* MODAL STYLES */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
     .modal-overlay.open { display: flex; }
     .modal-card { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; }
@@ -63,7 +62,12 @@
     <button class="tab-btn" onclick="switchTab('english')">English</button>
   </div>
 
-  <div id="content-area">Loading...</div>
+  <div id="content-area">
+      <div style="text-align:center; padding: 20px;">
+          <div class="spinner" style="border-color: #2f3a8f; border-top-color: transparent;"></div>
+          <p style="margin-top:10px; color:#666;">جاري تحميل البيانات...</p>
+      </div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="uploadModal">
@@ -89,7 +93,8 @@
 
 <script>
   // ------------------------------------
-  const API_URL = "https://script.google.com/macros/s/AKfycbx0_Hmdm2gucB87juLA_Rmzt1x8iL-ewnu3MsSf0SnEZQxqmN0e0I_1aktk_vw4j9kN/exec"; 
+  // IMPORTANT: Ensure no spaces are in this URL
+  const API_URL = "https://script.google.com/macros/s/AKfycbx0_Hmdm2gucB87juLA_Rmzt1x8iL-ewnu3MsSf0SnEZQxqmN0e0I_1aktk_vw4j9kN/exec";
   // ------------------------------------
 
   let currentUpload = { id: null, subject: null, files: [] };
@@ -97,11 +102,24 @@
   document.addEventListener('DOMContentLoaded', fetchData);
 
   async function fetchData() {
+    console.log("Start fetching data...");
     try {
       const res = await fetch(API_URL);
+      console.log("Response received from Google:", res);
+      
       const data = await res.json();
+      console.log("Data parsed:", data);
+      
       renderAll(data);
-    } catch(e) { document.getElementById('content-area').innerHTML = "Error loading data."; }
+    } catch(e) { 
+        console.error("Error:", e);
+        document.getElementById('content-area').innerHTML = `
+            <div style="text-align:center; color:red; padding:20px;">
+                <b>حدث خطأ أثناء التحميل</b><br>
+                ${e.message}<br>
+                <button onclick="location.reload()" style="margin-top:10px; padding:5px 10px;">إعادة المحاولة</button>
+            </div>`; 
+    }
   }
 
   function renderAll(data) {
@@ -114,7 +132,10 @@
         <div class="subject-card"><div class="card-header">${map[subj]}</div>`;
       
       if(!data[subj] || Object.keys(data[subj]).length === 0) {
-        html += `<div style="padding:40px; text-align:center; color:#888">تم رفع كل شيء! 🎉</div>`;
+        html += `<div style="padding:40px; text-align:center; color:#888">
+                    <span style="font-size:30px;">🎉</span><br>
+                    تم رفع كل محاضرات ${map[subj]}!
+                 </div>`;
       } else {
         for(const [grade, lecs] of Object.entries(data[subj])) {
           html += `<details open><summary>${grade}</summary><div class="table-wrapper"><table>
@@ -141,7 +162,7 @@
     currentUpload = { id, subject, files: [] };
     document.getElementById('modalSubtitle').innerText = title;
     document.getElementById('fileList').innerHTML = '';
-    document.getElementById('fileInput').value = ''; // Reset input
+    document.getElementById('fileInput').value = ''; 
     document.getElementById('uploadModal').classList.add('open');
   }
 
@@ -151,14 +172,12 @@
 
   window.handleFileSelect = function(input) {
     const list = document.getElementById('fileList');
-    list.innerHTML = ''; // Clear preview
-    currentUpload.files = []; // Clear data
+    list.innerHTML = ''; 
+    currentUpload.files = [];
 
     Array.from(input.files).forEach(file => {
-      // Create Reader
       const reader = new FileReader();
       reader.onload = function(e) {
-        // Remove "data:*/*;base64," prefix for GAS
         const base64Data = e.target.result.split(',')[1]; 
         currentUpload.files.push({
           name: file.name,
@@ -168,7 +187,6 @@
       };
       reader.readAsDataURL(file);
 
-      // UI Preview
       const item = document.createElement('div');
       item.className = 'file-item';
       item.innerText = `📄 ${file.name}`;
@@ -179,8 +197,10 @@
   window.submitUpload = async function() {
     const btn = document.getElementById('submitBtn');
     
-    // Check if files are selected (Optional - remove if you allow upload without files)
-    // if(currentUpload.files.length === 0) { alert("Please select a file"); return; }
+    if(currentUpload.files.length === 0) { 
+        alert("يرجى اختيار ملف واحد على الأقل"); 
+        return; 
+    }
 
     btn.innerHTML = '<div class="spinner"></div>';
     btn.disabled = true;
@@ -193,20 +213,43 @@
         body: JSON.stringify(currentUpload)
       });
 
-      // Optimistic Success
       closeModal();
       btn.innerHTML = 'تأكيد الرفع';
       btn.disabled = false;
       
-      // Remove row
       const row = document.getElementById(`row-${currentUpload.id}`);
       if(row) {
+        row.style.transition = 'all 0.5s';
+        row.style.opacity = '0';
         row.style.background = '#e6fffa';
-        setTimeout(() => row.remove(), 500);
+        
+        setTimeout(() => {
+          const tbody = row.parentElement;
+          row.remove();
+
+          if (tbody.children.length === 0) {
+             const tableWrapper = tbody.closest('.table-wrapper');
+             const details = tableWrapper.parentElement; 
+             const subjectCard = details.parentElement;  
+             
+             details.remove();
+
+             if (subjectCard.querySelectorAll('details').length === 0) {
+                 const headerText = subjectCard.querySelector('.card-header').innerText;
+                 subjectCard.innerHTML = `
+                    <div class="card-header">${headerText}</div>
+                    <div style="padding:40px; text-align:center; color:#888; animation: fadeIn 0.5s;">
+                        <span style="font-size:30px;">🎉</span><br>
+                        عاش، تم رفع كل محاضرات ${headerText}!
+                    </div>
+                 `;
+             }
+          }
+        }, 500);
       }
 
     } catch (err) {
-      alert("Error uploading. Try again.");
+      alert("حدث خطأ في الرفع، يرجى المحاولة مرة أخرى");
       btn.innerHTML = 'تأكيد الرفع';
       btn.disabled = false;
     }
