@@ -92,11 +92,11 @@
 </div>
 
 <script>
-  // ------------------------------------
-  // CONFIGURATION
-  // ------------------------------------
+  // =========================================================================
+  // PASTE YOUR NEWEST DEPLOYMENT URL HERE (Check "Manage Deployments")
+  // =========================================================================
   const API_URL = "https://script.google.com/macros/s/AKfycbx0_Hmdm2gucB87juLA_Rmzt1x8iL-ewnu3MsSf0SnEZQxqmN0e0I_1aktk_vw4j9kN/exec";
-  // ------------------------------------
+  // =========================================================================
 
   let currentUpload = { id: null, subject: null, files: [] };
 
@@ -108,13 +108,12 @@
       console.log("Fetching data...");
       const res = await fetch(API_URL);
       const data = await res.json();
-      console.log("Data loaded:", data);
       renderAll(data);
     } catch(e) {
       console.error(e);
       document.getElementById('content-area').innerHTML = `
         <div style="text-align:center; color:red; padding:30px;">
-           حدث خطأ في الاتصال بالسيرفر. تأكد من الإنترنت.<br>
+           حدث خطأ في الاتصال بالسيرفر. تأكد من الإنترنت أو الرابط.<br>
            <button onclick="location.reload()" style="margin-top:10px;">إعادة المحاولة</button>
         </div>`;
     }
@@ -135,9 +134,8 @@
     
     const subjects = Object.keys(subjectMap);
 
-    // Loop through each subject
+    // Loop through each subject to build HTML
     subjects.forEach((subj, index) => {
-      // Create the main card structure
       const subjectName = subjectMap[subj];
       const isActive = (index === 0) ? 'active-content' : '';
       
@@ -160,10 +158,10 @@
              تم رفع كل محاضرات ${subjectName}!
           </div>`;
       } else {
-        // Loop through Grades (G12, G09, etc.)
+        // Loop through Grades
         for (const [grade, lectures] of Object.entries(subjectData)) {
           
-          // Build rows for this grade
+          // Build rows
           let rowsHTML = '';
           lectures.forEach(l => {
             rowsHTML += `
@@ -177,7 +175,7 @@
             `;
           });
 
-          // Add the grade section (Details/Table)
+          // Add grade section
           cardHTML += `
             <details open>
               <summary>${grade}</summary>
@@ -200,7 +198,7 @@
         }
       }
 
-      cardHTML += `</div></div>`; // Close card and subject-content
+      cardHTML += `</div></div>`; // Close card
       cardDiv.innerHTML = cardHTML;
       container.appendChild(cardDiv);
     });
@@ -245,9 +243,10 @@
     });
   };
 
-  window.submitUpload = async function() {
+  window.submitUpload = function() {
     const btn = document.getElementById('submitBtn');
     
+    // Check files (Optional: Remove if you allow empty uploads)
     if(currentUpload.files.length === 0) { 
         alert("يرجى اختيار ملف واحد على الأقل"); 
         return; 
@@ -256,58 +255,68 @@
     btn.innerHTML = '<div class="spinner"></div>';
     btn.disabled = true;
 
-    try {
-      await fetch(API_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(currentUpload)
-      });
+    // Use standard POST (Errors will be visible in Console)
+    const params = {
+      method: "POST",
+      body: JSON.stringify(currentUpload)
+    };
 
-      closeModal();
+    fetch(API_URL, params)
+    .then(response => response.text())
+    .then(text => {
+       console.log("Server Response:", text); // Check Console for this!
+       
+       // Handle Backend Errors
+       if (text.includes("Error") || text.includes("error")) {
+         alert("خطأ من السيرفر: " + text);
+         btn.innerHTML = 'تأكيد الرفع';
+         btn.disabled = false;
+         return;
+       }
+
+       // SUCCESS LOGIC: Close Modal & Remove UI
+       closeModal();
+       btn.innerHTML = 'تأكيد الرفع';
+       btn.disabled = false;
+       
+       const row = document.getElementById(`row-${currentUpload.id}`);
+       if(row) {
+         row.style.transition = 'all 0.5s';
+         row.style.opacity = '0';
+         row.style.background = '#e6fffa';
+         
+         setTimeout(() => {
+           const tbody = row.parentElement;
+           row.remove();
+
+           // 1. Check if table is empty
+           if (tbody.children.length === 0) {
+              const tableWrapper = tbody.closest('.table-wrapper');
+              const details = tableWrapper.parentElement; 
+              const subjectCard = details.parentElement;  
+              
+              details.remove();
+
+              // 2. Check if Subject is empty (Show Congrats)
+              if (subjectCard.querySelectorAll('details').length === 0) {
+                  const headerText = subjectCard.querySelector('.card-header').innerText;
+                  const successMsg = document.createElement('div');
+                  successMsg.style.padding = '40px';
+                  successMsg.style.textAlign = 'center';
+                  successMsg.style.color = '#888';
+                  successMsg.innerHTML = `<span style="font-size:30px;">🎉</span><br>عاش، تم رفع كل محاضرات ${headerText}!`;
+                  subjectCard.appendChild(successMsg);
+              }
+           }
+         }, 500);
+       }
+    })
+    .catch(err => {
+      console.error("Fetch Error:", err);
+      alert("فشل الاتصال: تأكد من أن رابط الـ API صحيح في الكود");
       btn.innerHTML = 'تأكيد الرفع';
       btn.disabled = false;
-      
-      // Animate Removal
-      const row = document.getElementById(`row-${currentUpload.id}`);
-      if(row) {
-        row.style.transition = 'all 0.5s';
-        row.style.opacity = '0';
-        row.style.background = '#e6fffa';
-        
-        setTimeout(() => {
-          const tbody = row.parentElement;
-          row.remove();
-
-          // 1. Check if table is empty
-          if (tbody.children.length === 0) {
-             const tableWrapper = tbody.closest('.table-wrapper');
-             const details = tableWrapper.parentElement; 
-             const subjectCard = details.parentElement;  
-             
-             details.remove();
-
-             // 2. Check if Subject is empty
-             if (subjectCard.querySelectorAll('details').length === 0) {
-                 const headerText = subjectCard.querySelector('.card-header').innerText;
-                 // Inject Success Message
-                 const successMsg = document.createElement('div');
-                 successMsg.style.padding = '40px';
-                 successMsg.style.textAlign = 'center';
-                 successMsg.style.color = '#888';
-                 successMsg.innerHTML = `<span style="font-size:30px;">🎉</span><br>عاش، تم رفع كل محاضرات ${headerText}!`;
-                 subjectCard.appendChild(successMsg);
-             }
-          }
-        }, 500);
-      }
-
-    } catch (err) {
-      console.error(err);
-      alert("حدث خطأ في الرفع، يرجى المحاولة مرة أخرى");
-      btn.innerHTML = 'تأكيد الرفع';
-      btn.disabled = false;
-    }
+    });
   };
 
   window.switchTab = function(id) {
