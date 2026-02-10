@@ -142,7 +142,7 @@
 
     /* ACCORDION (DETAILS/SUMMARY) */
     details { border-bottom: 1px solid var(--border); transition: all 0.3s ease; }
-    details[open] { background: #fdfdfd; }
+    details[open] { background: var(--surface); }
     details:last-child { border-bottom: none; }
 
     summary {
@@ -155,7 +155,7 @@
       list-style: none;
       transition: background 0.2s;
     }
-    summary:hover { background: #f9fafb; }
+    summary:hover { background: var(--bg); }
     summary::-webkit-details-marker { display: none; }
     
     summary::after {
@@ -175,7 +175,7 @@
     .table-wrapper::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
     
     table { width: 100%; border-collapse: collapse; min-width: 600px; }
-    th { text-align: right; color: var(--text-muted); font-size: 0.85rem; padding: 12px 24px; background: #f8fafc; font-weight: 600; }
+    th { text-align: right; color: var(--text-muted); font-size: 0.85rem; padding: 12px 24px; background: var(--bg); font-weight: 600; }
     td { padding: 16px 24px; border-top: 1px solid var(--border); vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
     
@@ -191,7 +191,7 @@
 
     /* BUTTONS */
     .upload-btn {
-      background: white;
+      background: var(--surface);
       border: 2px solid var(--secondary);
       color: var(--primary);
       padding: 8px 18px;
@@ -214,7 +214,7 @@
     .modal-overlay.open { display: flex; opacity: 1; }
     
     .modal-card {
-      background: white; padding: 32px; border-radius: 24px; width: 90%; max-width: 480px;
+      background: var(--surface); padding: 32px; border-radius: 24px; width: 90%; max-width: 480px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .modal-overlay.open .modal-card { transform: scale(1); }
@@ -223,7 +223,7 @@
     .modal-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; }
 
     .file-drop-area {
-      border: 2px dashed #cbd5e1; background: #f8fafc;
+      border: 2px dashed #cbd5e1; background: var(--bg);
       padding: 40px 20px; text-align: center; border-radius: 16px;
       cursor: pointer; transition: 0.3s;
     }
@@ -231,8 +231,8 @@
     
     .file-list { margin-top: 15px; max-height: 120px; overflow-y: auto; }
     .file-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px; background: #fff; border: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px; background: var(--surface); border: 1px solid var(--border);
       border-radius: 10px; margin-bottom: 8px; font-size: 0.9rem;
     }
 
@@ -569,8 +569,27 @@
     currentUpload = { id: id, subject: subject, files: [] };
     document.getElementById('modalSubtitle').innerText = `جاري الرفع لـ: ${title}`;
     document.getElementById('fileList').innerHTML = '';
-    document.getElementById('fileInput').value = ''; 
-    document.getElementById('uploadModal').classList.add('open');
+    document.getElementById('fileInput').value = ''; 
+    document.getElementById('uploadModal').classList.add('open');
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/57687730-fad6-406e-985b-ff8325d62eeb', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: 'log_modal_open_' + Date.now(),
+        timestamp: Date.now(),
+        runId: 'initial',
+        hypothesisId: 'H-modal',
+        location: 'index.html:openUploadModal',
+        message: 'Upload modal opened',
+        data: {
+          uploadId: id,
+          subject,
+          hasOpenClass: document.getElementById('uploadModal').classList.contains('open')
+        }
+      })
+    }).catch(() => {});
+    // #endregion
   };
 
   window.closeModal = function() {
@@ -782,6 +801,24 @@
     const isDark = document.body.classList.toggle('dark-mode');
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
     updateThemeToggleLabel(isDark);
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/57687730-fad6-406e-985b-ff8325d62eeb', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: 'log_theme_toggle_' + Date.now(),
+        timestamp: Date.now(),
+        runId: 'initial',
+        hypothesisId: 'H-theme-toggle',
+        location: 'index.html:toggleTheme',
+        message: 'Theme toggled',
+        data: {
+          isDarkAfterToggle: isDark,
+          bodyClassList: Array.from(document.body.classList)
+        }
+      })
+    }).catch(() => {});
+    // #endregion
   };
 </script>
 </body>
