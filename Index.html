@@ -1,119 +1,97 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <title>نظام متابعة المحاضرات</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #f0f2f5;
-      --surface: #ffffff;
-      --primary: #4361ee;
-      --primary-dark: #3a56d4;
-      --secondary: #eef2ff;
-      --text-main: #1f2937;
-      --text-muted: #6b7280;
-      --border: #e5e7eb;
-      --radius: 16px;
-      --success: #10b981;
-      --danger: #ef4444;
-      --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    }
+  <meta charset="UTF-8" />
+  <title>نظام متابعة المحاضرات</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f0f2f5;
+      --surface: #ffffff;
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #eef2ff;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --radius: 16px;
+      --success: #10b981;
+      --danger: #ef4444;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
 
-    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-    
-    body { 
-      margin: 0; 
-      font-family: "Cairo", sans-serif; 
-      background: var(--bg); 
-      color: var(--text-main); 
-      overflow-x: hidden;
-    }
+    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+    
+    body { 
+      margin: 0; 
+      font-family: "Cairo", sans-serif; 
+      background: var(--bg); 
+      color: var(--text-main); 
+      overflow-x: hidden;
+    }
 
-    .container { max-width: 1000px; margin: auto; padding: 40px 20px 80px; }
+    .container { max-width: 1000px; margin: auto; padding: 40px 20px 80px; }
 
-    /* HEADER */
+    /* HEADER */
     header { text-align: center; margin-bottom: 40px; cursor: pointer; user-select: none; }
-    header h1 { margin: 0; font-size: 2rem; color: var(--primary); font-weight: 800; letter-spacing: -0.5px; }
-    header p { margin: 8px 0 0; color: var(--text-muted); font-size: 1rem; }
+    header h1 { margin: 0; font-size: 2rem; color: var(--primary); font-weight: 800; letter-spacing: -0.5px; }
+    header p { margin: 8px 0 0; color: var(--text-muted); font-size: 1rem; }
 
-    .theme-toggle {
-      margin-top: 12px;
-      padding: 6px 16px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
+    /* TABS */
+    .tabs-wrapper {
+      background: var(--surface);
+      padding: 10px;
+      border-radius: 50px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 30px;
+      position: sticky;
+      top: 20px;
+      z-index: 90;
+    }
+    
+    .tab-btn {
       background: transparent;
+      border: none;
       color: var(--text-muted);
+      padding: 10px 20px;
+      border-radius: 40px;
       font-family: "Cairo";
-      font-size: 0.85rem;
+      font-weight: 700;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
     }
-    .theme-toggle:hover {
-      background: var(--secondary);
+    
+    .tab-btn:hover { background: var(--secondary); color: var(--primary); }
+    .tab-btn.active { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3); }
+
+    /* CONTENT CARDS */
+    .subject-content { display: none; animation: fadeIn 0.4s ease forwards; }
+    .active-content { display: block; }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .subject-card { 
+      background: var(--surface); 
+      border-radius: var(--radius); 
+      box-shadow: var(--shadow); 
+      overflow: hidden; 
+      margin-bottom: 25px; 
+    }
+
+    .card-header {
+      padding: 20px 24px;
+      font-size: 1.1rem;
+      font-weight: 700;
       color: var(--primary);
-      border-color: var(--primary);
-      transform: translateY(-1px);
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(to left, #fff, var(--secondary));
     }
-
-    /* TABS */
-    .tabs-wrapper {
-      background: var(--surface);
-      padding: 10px;
-      border-radius: 50px;
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 30px;
-      position: sticky;
-      top: 20px;
-      z-index: 90;
-    }
-    
-    .tab-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      padding: 10px 20px;
-      border-radius: 40px;
-      font-family: "Cairo";
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 0.95rem;
-    }
-    
-    .tab-btn:hover { background: var(--secondary); color: var(--primary); }
-    .tab-btn.active { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3); }
-
-    /* CONTENT CARDS */
-    .subject-content { display: none; animation: fadeIn 0.4s ease forwards; }
-    .active-content { display: block; }
-    
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    .subject-card { 
-      background: var(--surface); 
-      border-radius: var(--radius); 
-      box-shadow: var(--shadow); 
-      overflow: hidden; 
-      margin-bottom: 25px; 
-    }
-
-    .card-header {
-      padding: 20px 24px;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--primary);
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(to left, #fff, var(--secondary));
-    }
 
     /* SEARCH BAR */
     .search-bar {
@@ -128,7 +106,7 @@
       border: 1px solid var(--border);
       font-family: "Cairo";
       font-size: 0.9rem;
-      background: transparent;
+      background: white;
       color: var(--text-main);
     }
     .search-input::placeholder {
@@ -140,101 +118,101 @@
       outline: none;
     }
 
-    /* ACCORDION (DETAILS/SUMMARY) */
-    details { border-bottom: 1px solid var(--border); transition: all 0.3s ease; }
-    details[open] { background: var(--surface); }
-    details:last-child { border-bottom: none; }
+    /* ACCORDION (DETAILS/SUMMARY) */
+    details { border-bottom: 1px solid var(--border); transition: all 0.3s ease; }
+    details[open] { background: #fdfdfd; }
+    details:last-child { border-bottom: none; }
 
-    summary {
-      cursor: pointer;
-      padding: 18px 24px;
-      font-weight: 600;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      list-style: none;
-      transition: background 0.2s;
-    }
-    summary:hover { background: var(--bg); }
-    summary::-webkit-details-marker { display: none; }
-    
-    summary::after {
-      content: '❮'; /* Chevron */
-      font-size: 14px;
-      color: var(--text-muted);
-      transition: transform 0.3s ease;
-      transform: rotate(90deg);
-    }
-    details[open] summary::after { transform: rotate(-90deg); color: var(--primary); }
+    summary {
+      cursor: pointer;
+      padding: 18px 24px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      list-style: none;
+      transition: background 0.2s;
+    }
+    summary:hover { background: #f9fafb; }
+    summary::-webkit-details-marker { display: none; }
+    
+    summary::after {
+      content: '❮';
+      font-size: 14px;
+      color: var(--text-muted);
+      transition: transform 0.3s ease;
+      transform: rotate(90deg);
+    }
+    details[open] summary::after { transform: rotate(-90deg); color: var(--primary); }
 
-    /* TABLES */
-    .table-wrapper { overflow-x: auto; padding-bottom: 5px; }
-    
-    /* Custom Scrollbar */
-    .table-wrapper::-webkit-scrollbar { height: 6px; }
-    .table-wrapper::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-    
-    table { width: 100%; border-collapse: collapse; min-width: 600px; }
-    th { text-align: right; color: var(--text-muted); font-size: 0.85rem; padding: 12px 24px; background: var(--bg); font-weight: 600; }
-    td { padding: 16px 24px; border-top: 1px solid var(--border); vertical-align: middle; }
-    tr:last-child td { border-bottom: none; }
-    
-    .chapter-badge {
-      display: inline-block;
-      background: var(--secondary);
-      color: var(--primary);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 700;
-    }
+    /* TABLES */
+    .table-wrapper { overflow-x: auto; padding-bottom: 5px; }
+    
+    /* Custom Scrollbar */
+    .table-wrapper::-webkit-scrollbar { height: 6px; }
+    .table-wrapper::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+    
+    table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    th { text-align: right; color: var(--text-muted); font-size: 0.85rem; padding: 12px 24px; background: #f8fafc; font-weight: 600; }
+    td { padding: 16px 24px; border-top: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    
+    .chapter-badge {
+      display: inline-block;
+      background: var(--secondary);
+      color: var(--primary);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
 
-    /* BUTTONS */
-    .upload-btn {
-      background: var(--surface);
-      border: 2px solid var(--secondary);
-      color: var(--primary);
-      padding: 8px 18px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-family: "Cairo";
-      font-weight: 700;
-      font-size: 0.9rem;
-      transition: 0.2s;
-    }
-    .upload-btn:hover { background: var(--primary); border-color: var(--primary); color: white; transform: translateY(-2px); }
+    /* BUTTONS */
+    .upload-btn {
+      background: white;
+      border: 2px solid var(--secondary);
+      color: var(--primary);
+      padding: 8px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: "Cairo";
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: 0.2s;
+    }
+    .upload-btn:hover { background: var(--primary); border-color: var(--primary); color: white; transform: translateY(-2px); }
 
-    /* MODAL */
-    .modal-overlay {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-      z-index: 1000; justify-content: center; align-items: center;
-      opacity: 0; transition: opacity 0.3s ease;
-    }
-    .modal-overlay.open { display: flex; opacity: 1; }
-    
-    .modal-card {
-      background: var(--surface); padding: 32px; border-radius: 24px; width: 90%; max-width: 480px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .modal-overlay.open .modal-card { transform: scale(1); }
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+      z-index: 1000; justify-content: center; align-items: center;
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    .modal-overlay.open { display: flex; opacity: 1; }
+    
+    .modal-card {
+      background: white; padding: 32px; border-radius: 24px; width: 90%; max-width: 480px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .modal-overlay.open .modal-card { transform: scale(1); }
 
-    .modal-title { font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 5px; }
-    .modal-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; }
+    .modal-title { font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 5px; }
+    .modal-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; }
 
-    .file-drop-area {
-      border: 2px dashed #cbd5e1; background: var(--bg);
-      padding: 40px 20px; text-align: center; border-radius: 16px;
-      cursor: pointer; transition: 0.3s;
-    }
-    .file-drop-area:hover { border-color: var(--primary); background: #f0f4ff; }
-    
-    .file-list { margin-top: 15px; max-height: 120px; overflow-y: auto; }
-    .file-item {
+    .file-drop-area {
+      border: 2px dashed #cbd5e1; background: #f8fafc;
+      padding: 40px 20px; text-align: center; border-radius: 16px;
+      cursor: pointer; transition: 0.3s;
+    }
+    .file-drop-area:hover { border-color: var(--primary); background: #f0f4ff; }
+    
+    .file-list { margin-top: 15px; max-height: 120px; overflow-y: auto; }
+    .file-item {
       display: flex; align-items: center; gap: 10px;
-      padding: 10px; background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; margin-bottom: 8px; font-size: 0.9rem;
-    }
+      padding: 10px; background: #fff; border: 1px solid var(--border);
+      border-radius: 10px; margin-bottom: 8px; font-size: 0.9rem;
+    }
 
     .file-thumb {
       width: 40px;
@@ -268,249 +246,170 @@
       transform: translateY(-1px);
     }
 
-    .modal-actions { display: flex; gap: 12px; margin-top: 25px; }
-    .btn-submit { flex: 2; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-family: "Cairo"; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem; }
-    .btn-submit:hover:not(:disabled) { background: var(--primary-dark); }
-    .btn-submit:disabled { background: #cbd5e1; cursor: not-allowed; }
-    .btn-cancel { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 12px; cursor: pointer; font-family: "Cairo"; font-weight: 600; }
-    .btn-cancel:hover { background: #f9fafb; }
+    .modal-actions { display: flex; gap: 12px; margin-top: 25px; }
+    .btn-submit { flex: 2; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-family: "Cairo"; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem; }
+    .btn-submit:hover:not(:disabled) { background: var(--primary-dark); }
+    .btn-submit:disabled { background: #cbd5e1; cursor: not-allowed; }
+    .btn-cancel { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 12px; cursor: pointer; font-family: "Cairo"; font-weight: 600; }
+    .btn-cancel:hover { background: #f9fafb; }
 
-    /* TOAST NOTIFICATION */
-    #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
-    .toast {
-      background: #333; color: white; padding: 12px 24px; border-radius: 50px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-size: 0.9rem; font-weight: 600;
-      display: flex; align-items: center; gap: 10px; animation: slideUp 0.3s ease forwards;
-    }
-    .toast.success { background: var(--success); }
-    .toast.error { background: var(--danger); }
-    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-    /* SPINNER */
-    .spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin: auto; }
-    .page-loader { width: 40px; height: 40px; border-color: var(--secondary); border-top-color: var(--primary); }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* DEBUG */
-    #debug-console { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 200px; background: #111; color: #0f0; font-family: monospace; padding: 10px; overflow-y: auto; z-index: 9999; font-size: 12px; direction: ltr; text-align: left; opacity: 0.95; }
-    .log-line { border-bottom: 1px solid #333; padding: 2px 0; }
-    .log-line.error { color: #ff5555; }
-
-    /* DARK MODE */
-    body.dark-mode {
-      --bg: #020617;
-      --surface: #020617;
-      --primary: #38bdf8;
-      --primary-dark: #0ea5e9;
-      --secondary: #0f172a;
-      --text-main: #e5e7eb;
-      --text-muted: #9ca3af;
-      --border: #1f2937;
-      --shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+    /* TOAST NOTIFICATION */
+    #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+    .toast {
+      background: #333; color: white; padding: 12px 24px; border-radius: 50px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-size: 0.9rem; font-weight: 600;
+      display: flex; align-items: center; gap: 10px; animation: slideUp 0.3s ease forwards;
     }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-    body.dark-mode .card-header {
-      background: linear-gradient(to left, #020617, #0f172a);
-    }
+    /* SPINNER */
+    .spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin: auto; }
+    .page-loader { width: 40px; height: 40px; border-color: var(--secondary); border-top-color: var(--primary); }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    body.dark-mode details[open] {
-      background: #020617;
-    }
-
-    body.dark-mode summary:hover {
-      background: #020617;
-    }
-
-    body.dark-mode th {
-      background: #020617;
-    }
-
-    body.dark-mode .modal-card {
-      background: #020617;
-    }
-
-    body.dark-mode .file-drop-area {
-      background: #020617;
-      border-color: #1f2937;
-    }
-
-    body.dark-mode .file-item {
-      background: #020617;
-    }
-
-    body.dark-mode #debug-console {
-      background: #020617;
-    }
-  </style>
+    /* DEBUG */
+    #debug-console { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 200px; background: #111; color: #0f0; font-family: monospace; padding: 10px; overflow-y: auto; z-index: 9999; font-size: 12px; direction: ltr; text-align: left; opacity: 0.95; }
+    .log-line { border-bottom: 1px solid #333; padding: 2px 0; }
+    .log-line.error { color: #ff5555; }
+  </style>
 </head>
 <body>
 
 <div class="container">
-  <header id="main-header">
-    <h1>نظام متابعة الأسئلة</h1>
-    <p>إدارة ومزامنة ملفات المحاضرات</p>
-    <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()"></button>
-  </header>
+  <header id="main-header">
+    <h1>نظام متابعة الأسئلة</h1>
+    <p>إدارة ومزامنة ملفات المحاضرات</p>
+  </header>
 
-  <div class="tabs-wrapper">
-    <button class="tab-btn active" onclick="switchTab('chemistry')">الكيمياء</button>
-    <button class="tab-btn" onclick="switchTab('biology')">الأحياء</button>
-    <button class="tab-btn" onclick="switchTab('math')">الرياضيات</button>
-    <button class="tab-btn" onclick="switchTab('arabic')">اللغة العربية</button>
-    <button class="tab-btn" onclick="switchTab('physics')">الفيزياء</button>
-    <button class="tab-btn" onclick="switchTab('english')">English</button>
-  </div>
+  <div class="tabs-wrapper">
+    <button class="tab-btn active" onclick="switchTab('chemistry')">الكيمياء</button>
+    <button class="tab-btn" onclick="switchTab('biology')">الأحياء</button>
+    <button class="tab-btn" onclick="switchTab('math')">الرياضيات</button>
+    <button class="tab-btn" onclick="switchTab('arabic')">اللغة العربية</button>
+    <button class="tab-btn" onclick="switchTab('physics')">الفيزياء</button>
+    <button class="tab-btn" onclick="switchTab('english')">English</button>
+  </div>
 
-  <div id="content-area">
-      <div style="text-align:center; padding: 80px 20px;">
-          <div class="spinner page-loader"></div>
-          <p style="margin-top:15px; color:var(--text-muted); font-weight:600;">جاري جلب البيانات من السيرفر...</p>
-      </div>
-  </div>
+  <div id="content-area">
+      <div style="text-align:center; padding: 80px 20px;">
+          <div class="spinner page-loader"></div>
+          <p style="margin-top:15px; color:var(--text-muted); font-weight:600;">جاري جلب البيانات من السيرفر...</p>
+      </div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="uploadModal">
-  <div class="modal-card">
-    <div class="modal-title">رفع الملفات</div>
-    <div id="modalSubtitle" class="modal-subtitle"></div>
-    
-    <div class="file-drop-area" onclick="document.getElementById('fileInput').click()">
-      <div style="font-size:32px; margin-bottom:10px;">☁️</div>
-      <div style="font-weight:700; color:var(--primary)">اضغط لاختيار الملفات</div>
-      <div style="font-size:12px; color:#94a3b8; margin-top:5px;">يدعم الصور و PDF</div>
-    </div>
-    <input type="file" id="fileInput" hidden multiple onchange="handleFileSelect(this)">
-    
-    <div class="file-list" id="fileList"></div>
-    
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
-      <button class="btn-submit" id="submitBtn" onclick="submitUpload()">رفع الآن</button>
-    </div>
-  </div>
+  <div class="modal-card">
+    <div class="modal-title">رفع الملفات</div>
+    <div id="modalSubtitle" class="modal-subtitle"></div>
+    
+    <div class="file-drop-area" onclick="document.getElementById('fileInput').click()">
+      <div style="font-size:32px; margin-bottom:10px;">☁️</div>
+      <div style="font-weight:700; color:var(--primary)">اضغط لاختيار الملفات</div>
+      <div style="font-size:12px; color:#94a3b8; margin-top:5px;">يدعم الصور و PDF</div>
+    </div>
+    <input type="file" id="fileInput" hidden multiple onchange="handleFileSelect(this)">
+    
+    <div class="file-list" id="fileList"></div>
+    
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
+      <button class="btn-submit" id="submitBtn" onclick="submitUpload()">رفع الآن</button>
+    </div>
+  </div>
 </div>
 
 <div id="toast-container"></div>
 
 <div id="debug-console">
-  <div>> SYSTEM READY. TRIPLE CLICK TITLE TO TOGGLE.</div>
+  <div>> SYSTEM READY. TRIPLE CLICK TITLE TO TOGGLE.</div>
 </div>
 
 <script>
-  // =========================================================================
-  // CONFIGURATION
-  // =========================================================================
-  const API_URL = "https://script.google.com/macros/s/AKfycbx0_Hmdm2gucB87juLA_Rmzt1x8iL-ewnu3MsSf0SnEZQxqmN0e0I_1aktk_vw4j9kN/exec";
-  
+  // =========================================================================
+  // CONFIGURATION
+  // =========================================================================
+  const API_URL = "https://script.google.com/macros/s/AKfycbx0_Hmdm2gucB87juLA_Rmzt1x8iL-ewnu3MsSf0SnEZQxqmN0e0I_1aktk_vw4j9kN/exec";
+  
   let currentUpload = { id: null, subject: null, files: [] };
 
   // Initialize
   document.addEventListener('DOMContentLoaded', () => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/57687730-fad6-406e-985b-ff8325d62eeb', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: 'log_domcontent_' + Date.now(),
-        timestamp: Date.now(),
-        runId: 'initial',
-        hypothesisId: 'H-runtime',
-        location: 'index.html:DOMContentLoaded',
-        message: 'DOMContentLoaded fired, initializing app',
-        data: {}
-      })
-    }).catch(() => {});
-    // #endregion
-
-    initTheme();
     fetchData();
   });
 
-  // --- TRIPLE CLICK SECRET ---
-  let clickCount = 0;
-  const titleHeader = document.getElementById('main-header');
-  const debugConsole = document.getElementById('debug-console');
+  // --- TRIPLE CLICK SECRET ---
+  let clickCount = 0;
+  const titleHeader = document.getElementById('main-header');
+  const debugConsole = document.getElementById('debug-console');
 
-  titleHeader.addEventListener('click', () => {
-    clickCount++;
-    if (clickCount === 3) {
-      debugConsole.style.display = (debugConsole.style.display === 'block') ? 'none' : 'block';
-      logToConsole("DEBUG MODE TOGGLED");
-      clickCount = 0;
-    }
-    setTimeout(() => clickCount = 0, 1000);
-  });
+  titleHeader.addEventListener('click', () => {
+    clickCount++;
+    if (clickCount === 3) {
+      debugConsole.style.display = (debugConsole.style.display === 'block') ? 'none' : 'block';
+      logToConsole("DEBUG MODE TOGGLED");
+      clickCount = 0;
+    }
+    setTimeout(() => clickCount = 0, 1000);
+  });
 
-  function logToConsole(msg, type = 'normal') {
-    const line = document.createElement('div');
-    line.className = `log-line ${type}`;
-    line.innerText = `> ${msg}`;
-    debugConsole.appendChild(line);
-    debugConsole.scrollTop = debugConsole.scrollHeight; 
-  }
+  function logToConsole(msg, type = 'normal') {
+    const line = document.createElement('div');
+    line.className = `log-line ${type}`;
+    line.innerText = `> ${msg}`;
+    debugConsole.appendChild(line);
+    debugConsole.scrollTop = debugConsole.scrollHeight; 
+  }
 
-  function showToast(msg, type = 'success') {
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    const icon = type === 'success' ? '✅' : '⚠️';
-    toast.innerHTML = `<span>${icon}</span> ${msg}`;
-    container.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(20px)';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-  }
+  function showToast(msg, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    const icon = type === 'success' ? '✅' : '⚠️';
+    toast.innerHTML = `<span>${icon}</span> ${msg}`;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
 
-  // --- MAIN LOGIC ---
+  // --- MAIN LOGIC ---
 
-  async function fetchData() {
-    try {
-      const res = await fetch(API_URL);
-      const data = await res.json();
-      renderAll(data);
-    } catch(e) {
-      console.error(e);
-      document.getElementById('content-area').innerHTML = `
-        <div style="text-align:center; color:var(--danger); padding:40px;">
-           <div style="font-size:40px; margin-bottom:10px;">🔌</div>
-           <b>حدث خطأ في الاتصال</b><br>
-           <button onclick="location.reload()" class="upload-btn" style="margin-top:15px;">إعادة المحاولة</button>
-        </div>`;
-    }
-  }
+  async function fetchData() {
+    try {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      renderAll(data);
+    } catch(e) {
+      console.error(e);
+      document.getElementById('content-area').innerHTML = `
+        <div style="text-align:center; color:var(--danger); padding:40px;">
+           <div style="font-size:40px; margin-bottom:10px;">🔌</div>
+           <b>حدث خطأ في الاتصال</b><br>
+           <button onclick="location.reload()" class="upload-btn" style="margin-top:15px;">إعادة المحاولة</button>
+        </div>`;
+    }
+  }
 
-  function renderAll(data) {
-    const container = document.getElementById('content-area');
-    container.innerHTML = '';
+  function renderAll(data) {
+    const container = document.getElementById('content-area');
+    container.innerHTML = '';
     const subjectMap = { 
-      'chemistry': 'الكيمياء', 'biology': 'الأحياء', 'math': 'الرياضيات', 
-      'arabic': 'اللغة العربية', 'physics': 'الفيزياء', 'english': 'اللغة الإنجليزية' 
-    };
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/57687730-fad6-406e-985b-ff8325d62eeb', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: 'log_renderall_' + Date.now(),
-        timestamp: Date.now(),
-        runId: 'initial',
-        hypothesisId: 'H-data',
-        location: 'index.html:renderAll',
-        message: 'renderAll called with subjects',
-        data: { subjectKeys: Object.keys(subjectMap), receivedKeys: Object.keys(data || {}) }
-      })
-    }).catch(() => {});
-    // #endregion
-    
-    Object.keys(subjectMap).forEach((subj, index) => {
-      const subjectName = subjectMap[subj];
+      'chemistry': 'الكيمياء', 'biology': 'الأحياء', 'math': 'الرياضيات', 
+      'arabic': 'اللغة العربية', 'physics': 'الفيزياء', 'english': 'اللغة الإنجليزية' 
+    };
+    
+    Object.keys(subjectMap).forEach((subj, index) => {
+      const subjectName = subjectMap[subj];
       const isActive = (index === 0) ? 'active-content' : '';
-      const cardDiv = document.createElement('div');
-      cardDiv.id = subj;
-      cardDiv.className = `subject-content ${isActive}`;
-      
+      const cardDiv = document.createElement('div');
+      cardDiv.id = subj;
+      cardDiv.className = `subject-content ${isActive}`;
+      
       let cardHTML = `
         <div class="subject-card">
           <div class="card-header">${subjectName}</div>
@@ -522,82 +421,63 @@
               oninput="filterLectures('${subj}', this.value)"
             />
           </div>`;
-      const subjectData = data[subj];
+      const subjectData = data[subj];
 
-      if (!subjectData || Object.keys(subjectData).length === 0) {
-        cardHTML += `
-          <div style="padding:60px; text-align:center; color:var(--text-muted);">
-            <div style="font-size:40px; margin-bottom:10px;">🎉</div>
-            <div style="font-weight:600;">رائع! تم رفع جميع محاضرات ${subjectName}</div>
-          </div>`;
-      } else {
-        for (const [grade, lectures] of Object.entries(subjectData)) {
-          let rowsHTML = '';
-          lectures.forEach(l => {
-            rowsHTML += `
-              <tr id="row-${l.id}">
-                <td width="25%"><span class="chapter-badge">${l.chapter}</span></td>
-                <td><b>${l.lecture}</b></td>
-                <td style="text-align:center; width:120px;">
-                  <button class="upload-btn" onclick="openUploadModal('${l.id}', '${subj}', '${l.lecture}')">
-                    رفع 📤
-                  </button>
-                </td>
-              </tr>`;
-          });
-          cardHTML += `
-            <details open>
-              <summary>${grade}</summary>
-              <div class="table-wrapper">
-                <table>
-                  <thead><tr><th>الفصل</th><th>المحاضرة</th><th style="text-align:center">إجراء</th></tr></thead>
-                  <tbody>${rowsHTML}</tbody>
-                </table>
-              </div>
-            </details>`;
-        }
-      }
-      cardHTML += `</div></div>`;
-      cardDiv.innerHTML = cardHTML;
-      container.appendChild(cardDiv);
-    });
-  }
+      if (!subjectData || Object.keys(subjectData).length === 0) {
+        cardHTML += `
+          <div style="padding:60px; text-align:center; color:var(--text-muted);">
+            <div style="font-size:40px; margin-bottom:10px;">🎉</div>
+            <div style="font-weight:600;">رائع! تم رفع جميع محاضرات ${subjectName}</div>
+          </div>`;
+      } else {
+        for (const [grade, lectures] of Object.entries(subjectData)) {
+          let rowsHTML = '';
+          lectures.forEach(l => {
+            rowsHTML += `
+              <tr id="row-${l.id}">
+                <td width="25%"><span class="chapter-badge">${l.chapter}</span></td>
+                <td><b>${l.lecture}</b></td>
+                <td style="text-align:center; width:120px;">
+                  <button class="upload-btn" onclick="openUploadModal('${l.id}', '${subj}', '${l.lecture}')">
+                    رفع 📤
+                  </button>
+                </td>
+              </tr>`;
+          });
+          cardHTML += `
+            <details open>
+              <summary>${grade}</summary>
+              <div class="table-wrapper">
+                <table>
+                  <thead><tr><th>الفصل</th><th>المحاضرة</th><th style="text-align:center">إجراء</th></tr></thead>
+                  <tbody>${rowsHTML}</tbody>
+                </table>
+              </div>
+            </details>`;
+        }
+      }
+      cardHTML += `</div></div>`;
+      cardDiv.innerHTML = cardHTML;
+      container.appendChild(cardDiv);
+    });
+  }
 
-  // --- UPLOAD HANDLERS ---
+  // --- UPLOAD HANDLERS ---
 
-  window.openUploadModal = function(id, subject, title) {
-    currentUpload = { id: id, subject: subject, files: [] };
-    document.getElementById('modalSubtitle').innerText = `جاري الرفع لـ: ${title}`;
-    document.getElementById('fileList').innerHTML = '';
+  window.openUploadModal = function(id, subject, title) {
+    currentUpload = { id: id, subject: subject, files: [] };
+    document.getElementById('modalSubtitle').innerText = `جاري الرفع لـ: ${title}`;
+    document.getElementById('fileList').innerHTML = '';
     document.getElementById('fileInput').value = ''; 
     document.getElementById('uploadModal').classList.add('open');
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/57687730-fad6-406e-985b-ff8325d62eeb', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: 'log_modal_open_' + Date.now(),
-        timestamp: Date.now(),
-        runId: 'initial',
-        hypothesisId: 'H-modal',
-        location: 'index.html:openUploadModal',
-        message: 'Upload modal opened',
-        data: {
-          uploadId: id,
-          subject,
-          hasOpenClass: document.getElementById('uploadModal').classList.contains('open')
-        }
-      })
-    }).catch(() => {});
-    // #endregion
-  };
+  };
 
-  window.closeModal = function() {
-    document.getElementById('uploadModal').classList.remove('open');
-  };
+  window.closeModal = function() {
+    document.getElementById('uploadModal').classList.remove('open');
+  };
 
-  window.handleFileSelect = function(input) {
-    const list = document.getElementById('fileList');
+  window.handleFileSelect = function(input) {
+    const list = document.getElementById('fileList');
     list.innerHTML = '';
     currentUpload.files = [];
     
@@ -644,7 +524,7 @@
 
       reader.readAsDataURL(file);
     });
-  };
+  };
 
   window.removeSelectedFile = function(fileId, btnEl) {
     currentUpload.files = currentUpload.files.filter(f => f.id !== fileId);
@@ -654,91 +534,89 @@
     }
   };
 
-  window.submitUpload = function() {
-    const btn = document.getElementById('submitBtn');
+  window.submitUpload = function() {
+    const btn = document.getElementById('submitBtn');
     if(currentUpload.files.length === 0) { 
-        showToast("يرجى اختيار ملف واحد على الأقل", "error");
-        return; 
-    }
+        showToast("يرجى اختيار ملف واحد على الأقل", "error");
+        return; 
+    }
 
-    btn.innerHTML = '<div class="spinner"></div>';
-    btn.disabled = true;
-    logToConsole("Starting Upload...", "normal");
+    btn.innerHTML = '<div class="spinner"></div>';
+    btn.disabled = true;
+    logToConsole("Starting Upload...", "normal");
 
-    fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify(currentUpload)
-    })
-    .then(response => response.json())
-    .then(data => {
-       // --- PRINT SERVER LOGS ---
-       if (data.logs && data.logs.length > 0) {
-         data.logs.forEach(log => logToConsole(log));
-       }
+    fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify(currentUpload)
+    })
+    .then(response => response.json())
+    .then(data => {
+       // --- PRINT SERVER LOGS ---
+       if (data.logs && data.logs.length > 0) {
+         data.logs.forEach(log => logToConsole(log));
+       }
 
-       if (data.status === "error") {
-         showToast(data.message, "error");
-         logToConsole("ERROR: " + data.message, "error");
-         btn.innerHTML = 'رفع الآن';
-         btn.disabled = false;
-         return;
-       }
+       if (data.status === "error") {
+         showToast(data.message, "error");
+         logToConsole("ERROR: " + data.message, "error");
+         btn.innerHTML = 'رفع الآن';
+         btn.disabled = false;
+         return;
+       }
 
-       showToast("تم الرفع بنجاح!", "success");
-       logToConsole("Upload Success!", "success");
-       closeModal();
-       btn.innerHTML = 'رفع الآن';
-       btn.disabled = false;
-       
-       // Smooth Remove Animation
-       const row = document.getElementById(`row-${currentUpload.id}`);
-       if(row) {
-         row.style.transition = 'all 0.5s ease';
-         row.style.transform = 'translateX(-20px)';
-         row.style.opacity = '0';
-         setTimeout(() => {
-           const tbody = row.parentElement;
-           row.remove();
-           // Check if group is empty
-           if (tbody.children.length === 0) {
-              const details = tbody.closest('details'); 
-              const card = details.parentElement;  
-              details.style.opacity = '0';
-              setTimeout(() => {
-                  details.remove();
-                  if (card.querySelectorAll('details').length === 0) {
-                      card.innerHTML = `
-                      <div style="padding:60px; text-align:center; color:var(--text-muted);">
-                        <div style="font-size:40px; margin-bottom:10px;">🎉</div>
-                        <div style="font-weight:600;">تم الانتهاء من هذا القسم!</div>
-                      </div>`;
-                  }
-              }, 300);
-           }
-         }, 500);
-       }
-    })
-    .catch(err => {
-      console.error(err);
-      logToConsole("FETCH ERROR: " + err.toString(), "error");
-      showToast("فشل الاتصال بالسيرفر", "error");
-      btn.innerHTML = 'رفع الآن';
-      btn.disabled = false;
-    });
-  };
+       showToast("تم الرفع بنجاح!", "success");
+       logToConsole("Upload Success!", "success");
+       closeModal();
+       btn.innerHTML = 'رفع الآن';
+       btn.disabled = false;
+       
+       // Smooth Remove Animation
+       const row = document.getElementById(`row-${currentUpload.id}`);
+       if(row) {
+         row.style.transition = 'all 0.5s ease';
+         row.style.transform = 'translateX(-20px)';
+         row.style.opacity = '0';
+         setTimeout(() => {
+           const tbody = row.parentElement;
+           row.remove();
+           // Check if group is empty
+           if (tbody.children.length === 0) {
+              const details = tbody.closest('details'); 
+              const card = details.parentElement;  
+              details.style.opacity = '0';
+              setTimeout(() => {
+                  details.remove();
+                  if (card.querySelectorAll('details').length === 0) {
+                      card.innerHTML = `
+                      <div style="padding:60px; text-align:center; color:var(--text-muted);">
+                        <div style="font-size:40px; margin-bottom:10px;">🎉</div>
+                        <div style="font-weight:600;">تم الانتهاء من هذا القسم!</div>
+                      </div>`;
+                  }
+              }, 300);
+           }
+         }, 500);
+       }
+    })
+    .catch(err => {
+      console.error(err);
+      logToConsole("FETCH ERROR: " + err.toString(), "error");
+      showToast("فشل الاتصال بالسيرفر", "error");
+      btn.innerHTML = 'رفع الآن';
+      btn.disabled = false;
+    });
+  };
 
-  window.switchTab = function(id) {
-    document.querySelectorAll('.subject-content').forEach(c => {
-        c.classList.remove('active-content');
-        c.style.animation = 'none';
-        c.offsetHeight; /* trigger reflow */
-        c.style.animation = null; 
-    });
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    
-    document.getElementById(id).classList.add('active-content');
-    // Find the button that was clicked based on text or onclick attribute matches if needed, 
-    // but simpler to just use event target if available
+  window.switchTab = function(id) {
+    document.querySelectorAll('.subject-content').forEach(c => {
+        c.classList.remove('active-content');
+        c.style.animation = 'none';
+        c.offsetHeight; /* trigger reflow */
+        c.style.animation = null; 
+    });
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    
+    document.getElementById(id).classList.add('active-content');
     if(event && event.target) event.target.classList.add('active');
   };
 
@@ -755,70 +633,6 @@
       const text = row.textContent.toLowerCase();
       row.style.display = !q || text.includes(q) ? '' : 'none';
     });
-  };
-
-  // --- THEME TOGGLING ---
-
-  function updateThemeToggleLabel(isDark) {
-    const btn = document.getElementById('themeToggle');
-    if (!btn) return;
-    btn.textContent = isDark ? '☀️ الوضع النهاري' : '🌙 الوضع الليلي';
-  }
-
-  function initTheme() {
-    const saved = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const useDark = saved ? saved === 'dark' : prefersDark;
-
-    if (useDark) {
-      document.body.classList.add('dark-mode');
-    }
-
-    updateThemeToggleLabel(useDark);
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/57687730-fad6-406e-985b-ff8325d62eeb', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: 'log_theme_' + Date.now(),
-        timestamp: Date.now(),
-        runId: 'initial',
-        hypothesisId: 'H-theme',
-        location: 'index.html:initTheme',
-        message: 'Theme initialized',
-        data: {
-          saved,
-          prefersDark,
-          useDark,
-          hasDarkClass: document.body.classList.contains('dark-mode')
-        }
-      })
-    }).catch(() => {});
-    // #endregion
-  }
-
-  window.toggleTheme = function() {
-    const isDark = document.body.classList.toggle('dark-mode');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    updateThemeToggleLabel(isDark);
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/57687730-fad6-406e-985b-ff8325d62eeb', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: 'log_theme_toggle_' + Date.now(),
-        timestamp: Date.now(),
-        runId: 'initial',
-        hypothesisId: 'H-theme-toggle',
-        location: 'index.html:toggleTheme',
-        message: 'Theme toggled',
-        data: {
-          isDarkAfterToggle: isDark,
-          bodyClassList: Array.from(document.body.classList)
-        }
-      })
-    }).catch(() => {});
-    // #endregion
   };
 </script>
 </body>
