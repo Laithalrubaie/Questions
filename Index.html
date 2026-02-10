@@ -9,7 +9,7 @@
     :root { --bg: #f4f6fb; --card: #ffffff; --primary: #2f3a8f; --secondary: #e9ecff; --text: #1f2937; --muted: #6b7280; --border: #e5e7eb; --radius: 14px; --success: #10b981; }
     body { margin: 0; font-family: "Cairo", sans-serif; background: var(--bg); color: var(--text); }
     .container { max-width: 1100px; margin: auto; padding: 32px 20px 60px; }
-    header { text-align: center; margin-bottom: 30px; }
+    header { text-align: center; margin-bottom: 30px; cursor: pointer; user-select: none; }
     .tabs-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px; background: #fff; padding: 15px; border-radius: var(--radius); }
     .tab-btn { background: transparent; border: 2px solid var(--secondary); color: var(--muted); padding: 8px 16px; border-radius: 50px; font-family: "Cairo"; font-weight: 700; cursor: pointer; }
     .tab-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
@@ -43,12 +43,24 @@
     
     .spinner { width: 20px; height: 20px; border: 3px solid #ffffff33; border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* SECRET DEBUG TERMINAL */
+    #debug-console {
+      display: none; 
+      position: fixed; bottom: 0; left: 0; width: 100%; height: 200px;
+      background: #0d1117; color: #00ff41; font-family: 'Courier New', monospace;
+      padding: 10px; overflow-y: auto; z-index: 9999;
+      border-top: 3px solid #00ff41; direction: ltr; text-align: left; font-size: 12px;
+    }
+    .log-line { border-bottom: 1px solid #333; padding: 2px 0; }
+    .log-line.error { color: #ff4d4d; }
+    .log-line.success { color: #00ff41; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <header>
+  <header id="main-header">
     <h1>متابعة رفع الأسئلة</h1>
     <p>نظام المزامنة ورفع الملفات</p>
   </header>
@@ -91,21 +103,49 @@
   </div>
 </div>
 
+<div id="debug-console">
+  <div>> SYSTEM READY. TRIPLE CLICK TITLE TO TOGGLE.</div>
+</div>
+
 <script>
   // =========================================================================
-  // PASTE YOUR NEWEST DEPLOYMENT URL HERE (Check "Manage Deployments")
+  // PASTE YOUR NEWEST DEPLOYMENT URL HERE
   // =========================================================================
   const API_URL = "https://script.google.com/macros/s/AKfycbx0_Hmdm2gucB87juLA_Rmzt1x8iL-ewnu3MsSf0SnEZQxqmN0e0I_1aktk_vw4j9kN/exec";
   // =========================================================================
 
   let currentUpload = { id: null, subject: null, files: [] };
 
-  // Start the app
+  // Initialize
   document.addEventListener('DOMContentLoaded', fetchData);
+
+  // --- TRIPLE CLICK SECRET ---
+  let clickCount = 0;
+  const titleHeader = document.getElementById('main-header');
+  const debugConsole = document.getElementById('debug-console');
+
+  titleHeader.addEventListener('click', () => {
+    clickCount++;
+    if (clickCount === 3) {
+      debugConsole.style.display = (debugConsole.style.display === 'block') ? 'none' : 'block';
+      logToConsole("DEBUG MODE TOGGLED");
+      clickCount = 0;
+    }
+    setTimeout(() => clickCount = 0, 1000);
+  });
+
+  function logToConsole(msg, type = 'normal') {
+    const line = document.createElement('div');
+    line.className = `log-line ${type}`;
+    line.innerText = `> ${msg}`;
+    debugConsole.appendChild(line);
+    debugConsole.scrollTop = debugConsole.scrollHeight; 
+  }
+
+  // --- MAIN LOGIC ---
 
   async function fetchData() {
     try {
-      console.log("Fetching data...");
       const res = await fetch(API_URL);
       const data = await res.json();
       renderAll(data);
@@ -113,7 +153,7 @@
       console.error(e);
       document.getElementById('content-area').innerHTML = `
         <div style="text-align:center; color:red; padding:30px;">
-           حدث خطأ في الاتصال بالسيرفر. تأكد من الإنترنت أو الرابط.<br>
+           حدث خطأ في الاتصال بالسيرفر.<br>
            <button onclick="location.reload()" style="margin-top:10px;">إعادة المحاولة</button>
         </div>`;
     }
@@ -122,93 +162,53 @@
   function renderAll(data) {
     const container = document.getElementById('content-area');
     container.innerHTML = '';
-
     const subjectMap = { 
-      'chemistry': 'الكيمياء', 
-      'biology': 'الأحياء', 
-      'math': 'الرياضيات', 
-      'arabic': 'اللغة العربية', 
-      'physics': 'الفيزياء', 
-      'english': 'اللغة الإنجليزية' 
+      'chemistry': 'الكيمياء', 'biology': 'الأحياء', 'math': 'الرياضيات', 
+      'arabic': 'اللغة العربية', 'physics': 'الفيزياء', 'english': 'اللغة الإنجليزية' 
     };
     
-    const subjects = Object.keys(subjectMap);
-
-    // Loop through each subject to build HTML
-    subjects.forEach((subj, index) => {
+    Object.keys(subjectMap).forEach((subj, index) => {
       const subjectName = subjectMap[subj];
       const isActive = (index === 0) ? 'active-content' : '';
-      
       const cardDiv = document.createElement('div');
       cardDiv.id = subj;
       cardDiv.className = `subject-content ${isActive}`;
       
-      let cardHTML = `
-        <div class="subject-card">
-          <div class="card-header">${subjectName}</div>
-      `;
-
+      let cardHTML = `<div class="subject-card"><div class="card-header">${subjectName}</div>`;
       const subjectData = data[subj];
 
-      // CHECK: Is this subject empty?
       if (!subjectData || Object.keys(subjectData).length === 0) {
-        cardHTML += `
-          <div style="padding:40px; text-align:center; color:#888;">
-             <span style="font-size:30px;">🎉</span><br>
-             تم رفع كل محاضرات ${subjectName}!
-          </div>`;
+        cardHTML += `<div style="padding:40px; text-align:center; color:#888;"><span style="font-size:30px;">🎉</span><br>تم رفع كل محاضرات ${subjectName}!</div>`;
       } else {
-        // Loop through Grades
         for (const [grade, lectures] of Object.entries(subjectData)) {
-          
-          // Build rows
           let rowsHTML = '';
           lectures.forEach(l => {
             rowsHTML += `
               <tr id="row-${l.id}">
                 <td class="chapter-col">${l.chapter}</td>
                 <td>${l.lecture}</td>
-                <td style="text-align:center">
-                  <button class="upload-btn" onclick="openUploadModal('${l.id}', '${subj}', '${l.lecture}')">رفع</button>
-                </td>
-              </tr>
-            `;
+                <td style="text-align:center"><button class="upload-btn" onclick="openUploadModal('${l.id}', '${subj}', '${l.lecture}')">رفع</button></td>
+              </tr>`;
           });
-
-          // Add grade section
           cardHTML += `
             <details>
               <summary>${grade}</summary>
               <div class="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th class="chapter-col">الفصل</th>
-                      <th>المحاضرة</th>
-                      <th style="width:100px">إجراء</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${rowsHTML}
-                  </tbody>
-                </table>
+                <table><thead><tr><th class="chapter-col">الفصل</th><th>المحاضرة</th><th style="width:100px">إجراء</th></tr></thead><tbody>${rowsHTML}</tbody></table>
               </div>
-            </details>
-          `;
+            </details>`;
         }
       }
-
-      cardHTML += `</div></div>`; // Close card
+      cardHTML += `</div></div>`;
       cardDiv.innerHTML = cardHTML;
       container.appendChild(cardDiv);
     });
   }
 
-  // --- UPLOAD & MODAL LOGIC ---
+  // --- UPLOAD HANDLERS ---
 
   window.openUploadModal = function(id, subject, title) {
     currentUpload = { id: id, subject: subject, files: [] };
-    
     document.getElementById('modalSubtitle').innerText = title;
     document.getElementById('fileList').innerHTML = '';
     document.getElementById('fileInput').value = ''; 
@@ -223,19 +223,16 @@
     const list = document.getElementById('fileList');
     list.innerHTML = ''; 
     currentUpload.files = [];
-
     Array.from(input.files).forEach(file => {
       const reader = new FileReader();
       reader.onload = function(e) {
-        const base64Data = e.target.result.split(',')[1]; 
         currentUpload.files.push({
           name: file.name,
           mimeType: file.type,
-          data: base64Data
+          data: e.target.result.split(',')[1]
         });
       };
       reader.readAsDataURL(file);
-
       const item = document.createElement('div');
       item.className = 'file-item';
       item.innerText = `📄 ${file.name}`;
@@ -245,36 +242,32 @@
 
   window.submitUpload = function() {
     const btn = document.getElementById('submitBtn');
-    
-    // Check files (Optional: Remove if you allow empty uploads)
-    if(currentUpload.files.length === 0) { 
-        alert("يرجى اختيار ملف واحد على الأقل"); 
-        return; 
-    }
+    if(currentUpload.files.length === 0) { alert("يرجى اختيار ملف واحد على الأقل"); return; }
 
     btn.innerHTML = '<div class="spinner"></div>';
     btn.disabled = true;
+    logToConsole("Starting Upload...", "normal");
 
-    // Use standard POST (Errors will be visible in Console)
-    const params = {
+    fetch(API_URL, {
       method: "POST",
       body: JSON.stringify(currentUpload)
-    };
+    })
+    .then(response => response.json())
+    .then(data => {
+       // --- PRINT SERVER LOGS ---
+       if (data.logs && data.logs.length > 0) {
+         data.logs.forEach(log => logToConsole(log));
+       }
 
-    fetch(API_URL, params)
-    .then(response => response.text())
-    .then(text => {
-       console.log("Server Response:", text); // Check Console for this!
-       
-       // Handle Backend Errors
-       if (text.includes("Error") || text.includes("error")) {
-         alert("خطأ من السيرفر: " + text);
+       if (data.status === "error") {
+         alert("خطأ: " + data.message);
+         logToConsole("ERROR: " + data.message, "error");
          btn.innerHTML = 'تأكيد الرفع';
          btn.disabled = false;
          return;
        }
 
-       // SUCCESS LOGIC: Close Modal & Remove UI
+       logToConsole("Upload Success!", "success");
        closeModal();
        btn.innerHTML = 'تأكيد الرفع';
        btn.disabled = false;
@@ -283,37 +276,24 @@
        if(row) {
          row.style.transition = 'all 0.5s';
          row.style.opacity = '0';
-         row.style.background = '#e6fffa';
-         
          setTimeout(() => {
            const tbody = row.parentElement;
            row.remove();
-
-           // 1. Check if table is empty
            if (tbody.children.length === 0) {
-              const tableWrapper = tbody.closest('.table-wrapper');
-              const details = tableWrapper.parentElement; 
-              const subjectCard = details.parentElement;  
-              
+              const details = tbody.closest('.table-wrapper').parentElement; 
+              const card = details.parentElement;  
               details.remove();
-
-              // 2. Check if Subject is empty (Show Congrats)
-              if (subjectCard.querySelectorAll('details').length === 0) {
-                  const headerText = subjectCard.querySelector('.card-header').innerText;
-                  const successMsg = document.createElement('div');
-                  successMsg.style.padding = '40px';
-                  successMsg.style.textAlign = 'center';
-                  successMsg.style.color = '#888';
-                  successMsg.innerHTML = `<span style="font-size:30px;">🎉</span><br>عاش، تم رفع كل محاضرات ${headerText}!`;
-                  subjectCard.appendChild(successMsg);
+              if (card.querySelectorAll('details').length === 0) {
+                  card.innerHTML = `<div style="padding:40px; text-align:center; color:#888;">🎉<br>عاش، تم رفع الكل!</div>`;
               }
            }
          }, 500);
        }
     })
     .catch(err => {
-      console.error("Fetch Error:", err);
-      alert("فشل الاتصال: تأكد من أن رابط الـ API صحيح في الكود");
+      console.error(err);
+      logToConsole("FETCH ERROR: " + err.toString(), "error");
+      alert("فشل الاتصال: " + err.toString());
       btn.innerHTML = 'تأكيد الرفع';
       btn.disabled = false;
     });
@@ -322,10 +302,7 @@
   window.switchTab = function(id) {
     document.querySelectorAll('.subject-content').forEach(c => c.classList.remove('active-content'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    
-    const activeDiv = document.getElementById(id);
-    if(activeDiv) activeDiv.classList.add('active-content');
-    
+    document.getElementById(id).classList.add('active-content');
     if(event && event.target) event.target.classList.add('active');
   };
 </script>
