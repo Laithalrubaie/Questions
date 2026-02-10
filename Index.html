@@ -406,6 +406,22 @@
 
   // Initialize
   document.addEventListener('DOMContentLoaded', () => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/57687730-fad6-406e-985b-ff8325d62eeb', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: 'log_domcontent_' + Date.now(),
+        timestamp: Date.now(),
+        runId: 'initial',
+        hypothesisId: 'H-runtime',
+        location: 'index.html:DOMContentLoaded',
+        message: 'DOMContentLoaded fired, initializing app',
+        data: {}
+      })
+    }).catch(() => {});
+    // #endregion
+
     initTheme();
     fetchData();
   });
@@ -468,10 +484,25 @@
   function renderAll(data) {
     const container = document.getElementById('content-area');
     container.innerHTML = '';
-    const subjectMap = { 
+    const subjectMap = { 
       'chemistry': 'الكيمياء', 'biology': 'الأحياء', 'math': 'الرياضيات', 
       'arabic': 'اللغة العربية', 'physics': 'الفيزياء', 'english': 'اللغة الإنجليزية' 
     };
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/57687730-fad6-406e-985b-ff8325d62eeb', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: 'log_renderall_' + Date.now(),
+        timestamp: Date.now(),
+        runId: 'initial',
+        hypothesisId: 'H-data',
+        location: 'index.html:renderAll',
+        message: 'renderAll called with subjects',
+        data: { subjectKeys: Object.keys(subjectMap), receivedKeys: Object.keys(data || {}) }
+      })
+    }).catch(() => {});
+    // #endregion
     
     Object.keys(subjectMap).forEach((subj, index) => {
       const subjectName = subjectMap[subj];
@@ -725,6 +756,26 @@
     }
 
     updateThemeToggleLabel(useDark);
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/57687730-fad6-406e-985b-ff8325d62eeb', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: 'log_theme_' + Date.now(),
+        timestamp: Date.now(),
+        runId: 'initial',
+        hypothesisId: 'H-theme',
+        location: 'index.html:initTheme',
+        message: 'Theme initialized',
+        data: {
+          saved,
+          prefersDark,
+          useDark,
+          hasDarkClass: document.body.classList.contains('dark-mode')
+        }
+      })
+    }).catch(() => {});
+    // #endregion
   }
 
   window.toggleTheme = function() {
