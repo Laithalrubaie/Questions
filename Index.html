@@ -1,318 +1,310 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-  <base target="_top">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
+  <meta charset="UTF-8" />
+  <title>نظام متابعة المحاضرات</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* --- MODERN CSS STYLING --- */
-    :root {
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --bg: #f3f4f6;
-      --card: #ffffff;
-      --text: #1f2937;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-    }
-
-    .container {
-      background: var(--card);
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 450px;
-      text-align: center;
-    }
-
-    h2 { margin-bottom: 1.5rem; color: var(--text); }
-
-    .input-group { margin-bottom: 1rem; text-align: left; }
+    :root { --bg: #f4f6fb; --card: #ffffff; --primary: #2f3a8f; --secondary: #e9ecff; --text: #1f2937; --muted: #6b7280; --border: #e5e7eb; --radius: 14px; --success: #10b981; }
+    body { margin: 0; font-family: "Cairo", sans-serif; background: var(--bg); color: var(--text); }
+    .container { max-width: 1100px; margin: auto; padding: 32px 20px 60px; }
+    header { text-align: center; margin-bottom: 30px; cursor: pointer; user-select: none; }
+    .tabs-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px; background: #fff; padding: 15px; border-radius: var(--radius); }
+    .tab-btn { background: transparent; border: 2px solid var(--secondary); color: var(--muted); padding: 8px 16px; border-radius: 50px; font-family: "Cairo"; font-weight: 700; cursor: pointer; }
+    .tab-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .subject-content { display: none; }
+    .active-content { display: block; }
+    .subject-card { background: var(--card); border-radius: var(--radius); margin-bottom: 20px; border: 1px solid var(--border); overflow: hidden; }
+    .card-header { padding: 15px 20px; font-weight: 700; color: var(--primary); background: linear-gradient(135deg, var(--secondary), #ffffff); border-bottom: 1px solid var(--border); }
+    details { border-bottom: 1px solid var(--border); }
+    summary { cursor: pointer; padding: 15px 20px; font-weight: 600; display: flex; justify-content: space-between; }
+    table { width: 100%; border-collapse: collapse; min-width: 500px; }
+    th, td { padding: 14px 20px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    th.chapter-col { width: 25%; color: var(--primary); background: #fcfcfc; }
+    .upload-btn { background: var(--secondary); color: var(--primary); border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: "Cairo"; font-weight: bold; }
+    .upload-btn:hover { background: var(--primary); color: white; }
+    .table-wrapper { overflow-x: auto; }
     
-    label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; }
+    /* MODAL STYLES */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-overlay.open { display: flex; }
+    .modal-card { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; }
+    .modal-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 20px; color: var(--primary); }
+    .file-drop-area { border: 2px dashed var(--secondary); padding: 30px; text-align: center; border-radius: 10px; margin-bottom: 20px; cursor: pointer; transition: 0.3s; }
+    .file-drop-area:hover { border-color: var(--primary); background: #fafbff; }
+    .file-input { display: none; }
+    .file-list { margin-bottom: 20px; max-height: 150px; overflow-y: auto; font-size: 0.9rem; }
+    .file-item { display: flex; justify-content: space-between; padding: 8px; background: #f8f9fa; margin-bottom: 5px; border-radius: 6px; }
+    .modal-actions { display: flex; gap: 10px; }
+    .btn-submit { flex: 2; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-family: "Cairo"; font-weight: bold; cursor: pointer; }
+    .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+    .btn-cancel { flex: 1; background: transparent; border: 1px solid #ddd; color: #666; border-radius: 10px; cursor: pointer; font-family: "Cairo"; }
     
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      box-sizing: border-box; /* Fix padding issue */
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    input[type="text"]:focus { border-color: var(--primary); }
-
-    /* Drag & Drop Zone */
-    .drop-zone {
-      border: 2px dashed #d1d5db;
-      border-radius: 12px;
-      padding: 2rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      background: #fafafa;
-      position: relative;
-    }
-
-    .drop-zone:hover, .drop-zone.dragover {
-      border-color: var(--primary);
-      background: #eef2ff;
-    }
-
-    .drop-zone p { margin: 0; color: #6b7280; pointer-events: none; }
-    .drop-zone input { 
-      position: absolute; width: 100%; height: 100%; top:0; left:0; opacity: 0; cursor: pointer; 
-    }
-
-    /* File List */
-    #fileList {
-      margin-top: 1rem;
-      text-align: left;
-      font-size: 0.85rem;
-    }
-    .file-item {
-      background: #f3f4f6;
-      padding: 8px;
-      margin-bottom: 5px;
-      border-radius: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .file-remove { color: red; cursor: pointer; font-weight: bold; }
-
-    /* Button */
-    .btn-upload {
-      background-color: var(--primary);
-      color: white;
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 1.5rem;
-      transition: background 0.2s;
-    }
-
-    .btn-upload:hover { background-color: var(--primary-hover); }
-    .btn-upload:disabled { background-color: #9ca3af; cursor: not-allowed; }
-
-    /* Loading Overlay */
-    .loader-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(255, 255, 255, 0.9);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      z-index: 999;
-    }
-    
-    .spinner {
-      width: 50px; height: 50px;
-      border: 5px solid #e5e7eb;
-      border-top: 5px solid var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-bottom: 1rem;
-    }
-
+    .spinner { width: 20px; height: 20px; border: 3px solid #ffffff33; border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+    /* SECRET DEBUG TERMINAL */
+    #debug-console {
+      display: none; 
+      position: fixed; bottom: 0; left: 0; width: 100%; height: 200px;
+      background: #0d1117; color: #00ff41; font-family: 'Courier New', monospace;
+      padding: 10px; overflow-y: auto; z-index: 9999;
+      border-top: 3px solid #00ff41; direction: ltr; text-align: left; font-size: 12px;
+    }
+    .log-line { border-bottom: 1px solid #333; padding: 2px 0; }
+    .log-line.error { color: #ff4d4d; }
+    .log-line.success { color: #00ff41; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h2>🚀 Smart Uploader</h2>
-    
-    <div class="input-group">
-      <label>Student ID</label>
-      <input type="text" id="studentId" placeholder="e.g. 24">
-    </div>
+<div class="container">
+  <header id="main-header">
+    <h1>متابعة رفع الأسئلة</h1>
+    <p>نظام المزامنة ورفع الملفات</p>
+  </header>
 
-    <div class="input-group">
-      <label>Subject</label>
-      <input type="text" id="subject" placeholder="e.g. chemistry">
-    </div>
-
-    <div class="drop-zone" id="dropZone">
-      <p>📂 Drag & Drop files here<br><small>or click to browse</small></p>
-      <input type="file" id="fileInput" multiple>
-    </div>
-
-    <div id="fileList"></div>
-
-    <button class="btn-upload" id="uploadBtn" onclick="startUpload()">Upload Files</button>
+  <div class="tabs-container">
+    <button class="tab-btn active" onclick="switchTab('chemistry')">الكيمياء</button>
+    <button class="tab-btn" onclick="switchTab('biology')">الأحياء</button>
+    <button class="tab-btn" onclick="switchTab('math')">الرياضيات</button>
+    <button class="tab-btn" onclick="switchTab('arabic')">اللغة العربية</button>
+    <button class="tab-btn" onclick="switchTab('physics')">الفيزياء</button>
+    <button class="tab-btn" onclick="switchTab('english')">English</button>
   </div>
 
-  <div class="loader-overlay" id="loader">
-    <div class="spinner"></div>
-    <h3 style="color:var(--primary)">Processing...</h3>
-    <p>Detecting ghosts & translating aliens 👽</p>
+  <div id="content-area">
+      <div style="text-align:center; padding: 20px;">
+          <div class="spinner" style="border-color: #2f3a8f; border-top-color: transparent;"></div>
+          <p style="margin-top:10px; color:#666;">جاري تحميل البيانات...</p>
+      </div>
   </div>
+</div>
 
-  <script>
-    // --- JAVASCRIPT LOGIC ---
+<div class="modal-overlay" id="uploadModal">
+  <div class="modal-card">
+    <div class="modal-title">رفع ملفات المحاضرة</div>
+    <div id="modalSubtitle" style="margin-bottom:15px; font-size:0.9rem; color:#666;"></div>
     
-    // 1. Handle File Selection Visuals
-    const fileInput = document.getElementById('fileInput');
-    const fileListDisplay = document.getElementById('fileList');
-    const dropZone = document.getElementById('dropZone');
-    let selectedFiles = [];
-
-    // Drag effects
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      dropZone.addEventListener(eventName, preventDefaults, false)
-    });
-    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+    <div class="file-drop-area" onclick="document.getElementById('fileInput').click()">
+      <span style="font-size:24px">📂</span><br>
+      اضغط لاختيار الملفات<br>
+      <span style="font-size:12px; color:#999">PDF, Images, Word</span>
+    </div>
+    <input type="file" id="fileInput" class="file-input" multiple onchange="handleFileSelect(this)">
     
-    dropZone.addEventListener('dragover', () => dropZone.classList.add('dragover'));
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-    dropZone.addEventListener('drop', handleDrop);
+    <div class="file-list" id="fileList"></div>
+    
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
+      <button class="btn-submit" id="submitBtn" onclick="submitUpload()">تأكيد الرفع</button>
+    </div>
+  </div>
+</div>
 
-    function handleDrop(e) {
-      dropZone.classList.remove('dragover');
-      const files = e.dataTransfer.files;
-      handleFiles(files);
+<div id="debug-console">
+  <div>> SYSTEM READY. TRIPLE CLICK TITLE TO TOGGLE.</div>
+</div>
+
+<script>
+  // =========================================================================
+  // PASTE YOUR NEWEST DEPLOYMENT URL HERE
+  // =========================================================================
+  const API_URL = "https://script.google.com/macros/s/AKfycbx0_Hmdm2gucB87juLA_Rmzt1x8iL-ewnu3MsSf0SnEZQxqmN0e0I_1aktk_vw4j9kN/exec";
+  // =========================================================================
+
+  let currentUpload = { id: null, subject: null, files: [] };
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', fetchData);
+
+  // --- TRIPLE CLICK SECRET ---
+  let clickCount = 0;
+  const titleHeader = document.getElementById('main-header');
+  const debugConsole = document.getElementById('debug-console');
+
+  titleHeader.addEventListener('click', () => {
+    clickCount++;
+    if (clickCount === 3) {
+      debugConsole.style.display = (debugConsole.style.display === 'block') ? 'none' : 'block';
+      logToConsole("DEBUG MODE TOGGLED");
+      clickCount = 0;
     }
+    setTimeout(() => clickCount = 0, 1000);
+  });
 
-    fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+  function logToConsole(msg, type = 'normal') {
+    const line = document.createElement('div');
+    line.className = `log-line ${type}`;
+    line.innerText = `> ${msg}`;
+    debugConsole.appendChild(line);
+    debugConsole.scrollTop = debugConsole.scrollHeight; 
+  }
 
-    function handleFiles(files) {
-      selectedFiles = [...files]; // Store files
-      updateFileList();
+  // --- MAIN LOGIC ---
+
+  async function fetchData() {
+    try {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      renderAll(data);
+    } catch(e) {
+      console.error(e);
+      document.getElementById('content-area').innerHTML = `
+        <div style="text-align:center; color:red; padding:30px;">
+           حدث خطأ في الاتصال بالسيرفر.<br>
+           <button onclick="location.reload()" style="margin-top:10px;">إعادة المحاولة</button>
+        </div>`;
     }
+  }
 
-    function updateFileList() {
-      fileListDisplay.innerHTML = "";
-      selectedFiles.forEach((file, index) => {
-        let div = document.createElement('div');
-        div.className = 'file-item';
-        div.innerHTML = `<span>${file.name}</span> <span class="file-remove" onclick="removeFile(${index})">×</span>`;
-        fileListDisplay.appendChild(div);
-      });
-    }
+  function renderAll(data) {
+    const container = document.getElementById('content-area');
+    container.innerHTML = '';
+    const subjectMap = { 
+      'chemistry': 'الكيمياء', 'biology': 'الأحياء', 'math': 'الرياضيات', 
+      'arabic': 'اللغة العربية', 'physics': 'الفيزياء', 'english': 'اللغة الإنجليزية' 
+    };
+    
+    Object.keys(subjectMap).forEach((subj, index) => {
+      const subjectName = subjectMap[subj];
+      const isActive = (index === 0) ? 'active-content' : '';
+      const cardDiv = document.createElement('div');
+      cardDiv.id = subj;
+      cardDiv.className = `subject-content ${isActive}`;
+      
+      let cardHTML = `<div class="subject-card"><div class="card-header">${subjectName}</div>`;
+      const subjectData = data[subj];
 
-    function removeFile(index) {
-      selectedFiles.splice(index, 1);
-      updateFileList();
-    }
-
-    // 2. The Upload Logic
-    function startUpload() {
-      const id = document.getElementById('studentId').value.trim();
-      const subject = document.getElementById('subject').value.trim();
-
-      if (!id || !subject || selectedFiles.length === 0) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Missing Info',
-          text: 'Please fill in ID, Subject, and select at least one file.'
-        });
-        return;
-      }
-
-      // Show Loading Screen
-      document.getElementById('loader').style.display = 'flex';
-      document.getElementById('uploadBtn').disabled = true;
-
-      // Read files as Base64
-      const promises = selectedFiles.map(file => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const data = e.target.result.split(',')[1]; // Remove "data:application..." header
-            resolve({ name: file.name, mimeType: file.type, data: data });
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      });
-
-      Promise.all(promises).then(filesData => {
-        const payload = {
-          id: id,
-          subject: subject,
-          files: filesData
-        };
-
-        // Send to Google Script
-        // We use a trick to send JSON because GAS parameters can be tricky with large objects
-        const jsonPayload = JSON.stringify(payload);
-
-        // We need to simulate a POST request for the doPost function to catch it correctly
-        // Or we can just call a specialized function. 
-        // NOTE: Since you are using doPost(e), we can't call it directly from client-side JS like this easily.
-        // BUT, since we have the script, we should use google.script.run
-        
-        // *However*, your doPost is built for external Webhooks. 
-        // To make this work with the internal UI, we need to bypass doPost and call a helper.
-        // Let's assume you want to keep using the Web App URL for consistency.
-        
-        // Let's actually fetch the Web App URL!
-        const webAppUrl = "YOUR_CURRENT_WEB_APP_URL_HERE"; // <--- PASTE YOUR DEPLOYMENT URL HERE
-        
-        if(webAppUrl === "https://script.google.com/macros/s/AKfycbx0_Hmdm2gucB87juLA_Rmzt1x8iL-ewnu3MsSf0SnEZQxqmN0e0I_1aktk_vw4j9kN/exec") {
-           // Fallback if user forgot to paste URL: Try to use google.script.run logic
-           // But since your backend is strictly doPost(e), we have to use fetch.
-           Swal.fire('Config Error', 'Please edit the HTML code and paste your Web App URL in the script section!', 'error');
-           document.getElementById('loader').style.display = 'none';
-           document.getElementById('uploadBtn').disabled = false;
-           return;
+      if (!subjectData || Object.keys(subjectData).length === 0) {
+        cardHTML += `<div style="padding:40px; text-align:center; color:#888;"><span style="font-size:30px;">🎉</span><br>تم رفع كل محاضرات ${subjectName}!</div>`;
+      } else {
+        for (const [grade, lectures] of Object.entries(subjectData)) {
+          let rowsHTML = '';
+          lectures.forEach(l => {
+            rowsHTML += `
+              <tr id="row-${l.id}">
+                <td class="chapter-col">${l.chapter}</td>
+                <td>${l.lecture}</td>
+                <td style="text-align:center"><button class="upload-btn" onclick="openUploadModal('${l.id}', '${subj}', '${l.lecture}')">رفع</button></td>
+              </tr>`;
+          });
+          cardHTML += `
+            <details>
+              <summary>${grade}</summary>
+              <div class="table-wrapper">
+                <table><thead><tr><th class="chapter-col">الفصل</th><th>المحاضرة</th><th style="width:100px">إجراء</th></tr></thead><tbody>${rowsHTML}</tbody></table>
+              </div>
+            </details>`;
         }
+      }
+      cardHTML += `</div></div>`;
+      cardDiv.innerHTML = cardHTML;
+      container.appendChild(cardDiv);
+    });
+  }
 
-        fetch(webAppUrl, {
-          method: 'POST',
-          body: jsonPayload
-        })
-        .then(response => response.json())
-        .then(result => {
-          document.getElementById('loader').style.display = 'none';
-          document.getElementById('uploadBtn').disabled = false;
+  // --- UPLOAD HANDLERS ---
 
-          if (result.status === 'success') {
-            Swal.fire({
-              icon: 'success',
-              title: 'Upload Complete!',
-              text: 'Files converted and uploaded successfully.',
-              timer: 3000,
-              showConfirmButton: false
-            });
-            // Clear form
-            selectedFiles = [];
-            updateFileList();
-            document.getElementById('fileInput').value = "";
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Server Error',
-              text: 'Check logs: ' + JSON.stringify(result.logs)
-            });
-          }
-        })
-        .catch(err => {
-          document.getElementById('loader').style.display = 'none';
-          document.getElementById('uploadBtn').disabled = false;
-          Swal.fire('Network Error', err.toString(), 'error');
+  window.openUploadModal = function(id, subject, title) {
+    currentUpload = { id: id, subject: subject, files: [] };
+    document.getElementById('modalSubtitle').innerText = title;
+    document.getElementById('fileList').innerHTML = '';
+    document.getElementById('fileInput').value = ''; 
+    document.getElementById('uploadModal').classList.add('open');
+  };
+
+  window.closeModal = function() {
+    document.getElementById('uploadModal').classList.remove('open');
+  };
+
+  window.handleFileSelect = function(input) {
+    const list = document.getElementById('fileList');
+    list.innerHTML = ''; 
+    currentUpload.files = [];
+    Array.from(input.files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        currentUpload.files.push({
+          name: file.name,
+          mimeType: file.type,
+          data: e.target.result.split(',')[1]
         });
+      };
+      reader.readAsDataURL(file);
+      const item = document.createElement('div');
+      item.className = 'file-item';
+      item.innerText = `📄 ${file.name}`;
+      list.appendChild(item);
+    });
+  };
 
-      });
-    }
-  </script>
+  window.submitUpload = function() {
+    const btn = document.getElementById('submitBtn');
+    if(currentUpload.files.length === 0) { alert("يرجى اختيار ملف واحد على الأقل"); return; }
+
+    btn.innerHTML = '<div class="spinner"></div>';
+    btn.disabled = true;
+    logToConsole("Starting Upload...", "normal");
+
+    fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify(currentUpload)
+    })
+    .then(response => response.json())
+    .then(data => {
+       // --- PRINT SERVER LOGS ---
+       if (data.logs && data.logs.length > 0) {
+         data.logs.forEach(log => logToConsole(log));
+       }
+
+       if (data.status === "error") {
+         alert("خطأ: " + data.message);
+         logToConsole("ERROR: " + data.message, "error");
+         btn.innerHTML = 'تأكيد الرفع';
+         btn.disabled = false;
+         return;
+       }
+
+       logToConsole("Upload Success!", "success");
+       closeModal();
+       btn.innerHTML = 'تأكيد الرفع';
+       btn.disabled = false;
+       
+       const row = document.getElementById(`row-${currentUpload.id}`);
+       if(row) {
+         row.style.transition = 'all 0.5s';
+         row.style.opacity = '0';
+         setTimeout(() => {
+           const tbody = row.parentElement;
+           row.remove();
+           if (tbody.children.length === 0) {
+              const details = tbody.closest('.table-wrapper').parentElement; 
+              const card = details.parentElement;  
+              details.remove();
+              if (card.querySelectorAll('details').length === 0) {
+                  card.innerHTML = `<div style="padding:40px; text-align:center; color:#888;">🎉<br>عاش، تم رفع الكل!</div>`;
+              }
+           }
+         }, 500);
+       }
+    })
+    .catch(err => {
+      console.error(err);
+      logToConsole("FETCH ERROR: " + err.toString(), "error");
+      alert("فشل الاتصال: " + err.toString());
+      btn.innerHTML = 'تأكيد الرفع';
+      btn.disabled = false;
+    });
+  };
+
+  window.switchTab = function(id) {
+    document.querySelectorAll('.subject-content').forEach(c => c.classList.remove('active-content'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active-content');
+    if(event && event.target) event.target.classList.add('active');
+  };
+</script>
 </body>
 </html>
