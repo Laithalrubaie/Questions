@@ -6,9 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
+    /* VARIABLES & THEMES */
     :root {
       --bg: #f0f2f5;
       --surface: #ffffff;
+      --surface-2: #f8fafc;
       --primary: #4361ee;
       --primary-dark: #3a56d4;
       --secondary: #eef2ff;
@@ -19,6 +21,21 @@
       --success: #10b981;
       --danger: #ef4444;
       --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      --input-bg: #fff;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-2: #334155;
+      --primary: #6366f1;
+      --primary-dark: #818cf8;
+      --secondary: #312e81;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      --input-bg: #1e293b;
     }
 
     * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -29,14 +46,35 @@
       background: var(--bg); 
       color: var(--text-main); 
       overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
     }
 
-    .container { max-width: 1000px; margin: auto; padding: 40px 20px 80px; }
+    .container { max-width: 1000px; margin: auto; padding: 30px 20px 80px; }
 
-    /* HEADER */
-    header { text-align: center; margin-bottom: 40px; cursor: pointer; user-select: none; }
-    header h1 { margin: 0; font-size: 2rem; color: var(--primary); font-weight: 800; letter-spacing: -0.5px; }
-    header p { margin: 8px 0 0; color: var(--text-muted); font-size: 1rem; }
+    /* HEADER & DARK MODE TOGGLE */
+    header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 30px; 
+    }
+    
+    .header-text h1 { margin: 0; font-size: 1.8rem; color: var(--primary); font-weight: 800; }
+    .header-text p { margin: 5px 0 0; color: var(--text-muted); font-size: 0.9rem; }
+
+    .theme-toggle {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      width: 45px; height: 45px;
+      border-radius: 50%;
+      display: flex; justify-content: center; align-items: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      box-shadow: var(--shadow);
+      transition: 0.3s;
+    }
+    .theme-toggle:hover { background: var(--secondary); color: var(--primary); }
 
     /* TABS */
     .tabs-wrapper {
@@ -48,27 +86,22 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 8px;
-      margin-bottom: 30px;
-      position: sticky;
-      top: 20px;
-      z-index: 90;
+      margin-bottom: 25px;
+      position: sticky; top: 10px; z-index: 90;
+      border: 1px solid var(--border);
     }
     
     .tab-btn {
-      background: transparent;
-      border: none;
+      background: transparent; border: none;
       color: var(--text-muted);
       padding: 10px 20px;
       border-radius: 40px;
-      font-family: "Cairo";
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      font-family: "Cairo"; font-weight: 700;
+      cursor: pointer; transition: all 0.3s ease;
       font-size: 0.95rem;
     }
-    
     .tab-btn:hover { background: var(--secondary); color: var(--primary); }
-    .tab-btn.active { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3); }
+    .tab-btn.active { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); }
 
     /* CONTENT CARDS */
     .subject-content { display: none; animation: fadeIn 0.4s ease forwards; }
@@ -82,77 +115,75 @@
       box-shadow: var(--shadow); 
       overflow: hidden; 
       margin-bottom: 25px; 
+      border: 1px solid var(--border);
     }
 
-    .card-header {
-      padding: 20px 24px;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--primary);
+    .card-header-area {
+      padding: 20px;
       border-bottom: 1px solid var(--border);
-      background: linear-gradient(to left, #fff, var(--secondary));
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
+    
+    .card-title { font-size: 1.2rem; font-weight: 800; color: var(--primary); }
 
-    /* ACCORDION (DETAILS/SUMMARY) */
+    /* SEARCH BAR */
+    .search-container { position: relative; width: 100%; }
+    .search-input {
+      width: 100%;
+      padding: 12px 45px 12px 15px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-main);
+      font-family: "Cairo";
+      font-size: 0.95rem;
+      transition: 0.3s;
+    }
+    .search-input:focus { border-color: var(--primary); background: var(--input-bg); box-shadow: 0 0 0 3px var(--secondary); }
+    .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+    /* ACCORDION */
     details { border-bottom: 1px solid var(--border); transition: all 0.3s ease; }
-    details[open] { background: #fdfdfd; }
+    details[open] { background: var(--surface-2); }
     details:last-child { border-bottom: none; }
 
     summary {
-      cursor: pointer;
-      padding: 18px 24px;
-      font-weight: 600;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      list-style: none;
-      transition: background 0.2s;
+      cursor: pointer; padding: 18px 24px; font-weight: 700;
+      display: flex; justify-content: space-between; align-items: center;
+      list-style: none; color: var(--text-main); transition: background 0.2s;
     }
-    summary:hover { background: #f9fafb; }
+    summary:hover { background: var(--surface-2); }
     summary::-webkit-details-marker { display: none; }
-    
     summary::after {
-      content: '❮'; /* Chevron */
-      font-size: 14px;
-      color: var(--text-muted);
-      transition: transform 0.3s ease;
-      transform: rotate(90deg);
+      content: '❮'; font-size: 14px; color: var(--text-muted);
+      transition: transform 0.3s ease; transform: rotate(90deg);
     }
     details[open] summary::after { transform: rotate(-90deg); color: var(--primary); }
 
     /* TABLES */
     .table-wrapper { overflow-x: auto; padding-bottom: 5px; }
-    
-    /* Custom Scrollbar */
-    .table-wrapper::-webkit-scrollbar { height: 6px; }
-    .table-wrapper::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-    
     table { width: 100%; border-collapse: collapse; min-width: 600px; }
-    th { text-align: right; color: var(--text-muted); font-size: 0.85rem; padding: 12px 24px; background: #f8fafc; font-weight: 600; }
-    td { padding: 16px 24px; border-top: 1px solid var(--border); vertical-align: middle; }
+    th { text-align: right; color: var(--text-muted); font-size: 0.85rem; padding: 12px 24px; border-bottom: 1px solid var(--border); font-weight: 600; }
+    td { padding: 16px 24px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text-main); }
     tr:last-child td { border-bottom: none; }
     
     .chapter-badge {
-      display: inline-block;
-      background: var(--secondary);
-      color: var(--primary);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 700;
+      display: inline-block; background: var(--secondary);
+      color: var(--primary); padding: 4px 10px;
+      border-radius: 6px; font-size: 0.85rem; font-weight: 700;
     }
 
-    /* BUTTONS */
+    /* UPLOAD BUTTON */
     .upload-btn {
-      background: white;
-      border: 2px solid var(--secondary);
-      color: var(--primary);
+      background: var(--surface);
+      border: 2px solid var(--border);
+      color: var(--text-main);
       padding: 8px 18px;
       border-radius: 10px;
       cursor: pointer;
-      font-family: "Cairo";
-      font-weight: 700;
-      font-size: 0.9rem;
+      font-family: "Cairo"; font-weight: 700; font-size: 0.9rem;
       transition: 0.2s;
     }
     .upload-btn:hover { background: var(--primary); border-color: var(--primary); color: white; transform: translateY(-2px); }
@@ -160,70 +191,80 @@
     /* MODAL */
     .modal-overlay {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
       z-index: 1000; justify-content: center; align-items: center;
       opacity: 0; transition: opacity 0.3s ease;
     }
     .modal-overlay.open { display: flex; opacity: 1; }
     
     .modal-card {
-      background: white; padding: 32px; border-radius: 24px; width: 90%; max-width: 480px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: var(--surface); padding: 32px; border-radius: 24px; width: 90%; max-width: 500px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      max-height: 90vh; display: flex; flex-direction: column;
     }
     .modal-overlay.open .modal-card { transform: scale(1); }
 
     .modal-title { font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 5px; }
-    .modal-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; }
+    .modal-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; }
 
     .file-drop-area {
-      border: 2px dashed #cbd5e1; background: #f8fafc;
-      padding: 40px 20px; text-align: center; border-radius: 16px;
-      cursor: pointer; transition: 0.3s;
+      border: 2px dashed var(--border); background: var(--surface-2);
+      padding: 30px; text-align: center; border-radius: 16px;
+      cursor: pointer; transition: 0.3s; margin-bottom: 20px;
     }
-    .file-drop-area:hover { border-color: var(--primary); background: #f0f4ff; }
+    .file-drop-area:hover { border-color: var(--primary); background: var(--secondary); }
     
-    .file-list { margin-top: 15px; max-height: 120px; overflow-y: auto; }
+    /* FILE LIST WITH THUMBNAILS */
+    .file-list { flex: 1; overflow-y: auto; margin-bottom: 20px; max-height: 200px; }
     .file-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px; background: #fff; border: 1px solid var(--border);
-      border-radius: 10px; margin-bottom: 8px; font-size: 0.9rem;
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px; background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 12px; margin-bottom: 8px;
     }
+    .file-preview {
+      width: 40px; height: 40px; border-radius: 8px; object-fit: cover;
+      background: #ddd; display: flex; justify-content: center; align-items: center; font-size: 10px;
+    }
+    .file-info { flex: 1; overflow: hidden; }
+    .file-name { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
+    .file-size { font-size: 0.75rem; color: var(--text-muted); }
+    
+    .btn-remove {
+      background: transparent; border: none; color: var(--danger);
+      font-size: 1.2rem; cursor: pointer; padding: 5px; border-radius: 5px;
+    }
+    .btn-remove:hover { background: rgba(239, 68, 68, 0.1); }
 
-    .modal-actions { display: flex; gap: 12px; margin-top: 25px; }
+    .modal-actions { display: flex; gap: 12px; }
     .btn-submit { flex: 2; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-family: "Cairo"; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem; }
     .btn-submit:hover:not(:disabled) { background: var(--primary-dark); }
-    .btn-submit:disabled { background: #cbd5e1; cursor: not-allowed; }
-    .btn-cancel { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 12px; cursor: pointer; font-family: "Cairo"; font-weight: 600; }
-    .btn-cancel:hover { background: #f9fafb; }
+    .btn-submit:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+    .btn-cancel { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-main); border-radius: 12px; cursor: pointer; font-family: "Cairo"; font-weight: 600; }
+    .btn-cancel:hover { background: var(--surface-2); }
 
-    /* TOAST NOTIFICATION */
+    /* UTILS */
     #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
-    .toast {
-      background: #333; color: white; padding: 12px 24px; border-radius: 50px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-size: 0.9rem; font-weight: 600;
-      display: flex; align-items: center; gap: 10px; animation: slideUp 0.3s ease forwards;
-    }
+    .toast { background: #333; color: white; padding: 12px 24px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 10px; animation: slideUp 0.3s ease forwards; }
     .toast.success { background: var(--success); }
     .toast.error { background: var(--danger); }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-    /* SPINNER */
-    .spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin: auto; }
-    .page-loader { width: 40px; height: 40px; border-color: var(--secondary); border-top-color: var(--primary); }
+    .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin: auto; }
+    .page-loader { width: 40px; height: 40px; border-color: var(--border); border-top-color: var(--primary); }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* DEBUG */
-    #debug-console { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 200px; background: #111; color: #0f0; font-family: monospace; padding: 10px; overflow-y: auto; z-index: 9999; font-size: 12px; direction: ltr; text-align: left; opacity: 0.95; }
-    .log-line { border-bottom: 1px solid #333; padding: 2px 0; }
-    .log-line.error { color: #ff5555; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <header id="main-header">
-    <h1>نظام متابعة الأسئلة</h1>
-    <p>إدارة ومزامنة ملفات المحاضرات</p>
+  <header>
+    <div class="header-text">
+      <h1>نظام متابعة الأسئلة</h1>
+      <p>إدارة ملفات المحاضرات والمراجعات</p>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="تغيير المظهر">
+      🌙
+    </button>
   </header>
 
   <div class="tabs-wrapper">
@@ -238,7 +279,7 @@
   <div id="content-area">
       <div style="text-align:center; padding: 80px 20px;">
           <div class="spinner page-loader"></div>
-          <p style="margin-top:15px; color:var(--text-muted); font-weight:600;">جاري جلب البيانات من السيرفر...</p>
+          <p style="margin-top:15px; color:var(--text-muted);">جاري تحميل البيانات...</p>
       </div>
   </div>
 </div>
@@ -251,86 +292,79 @@
     <div class="file-drop-area" onclick="document.getElementById('fileInput').click()">
       <div style="font-size:32px; margin-bottom:10px;">☁️</div>
       <div style="font-weight:700; color:var(--primary)">اضغط لاختيار الملفات</div>
+      <div style="font-size:12px; color:var(--text-muted); margin-top:5px;">Images, PDF, Docx</div>
     </div>
     <input type="file" id="fileInput" hidden multiple onchange="handleFileSelect(this)">
     
-    <div class="file-list" id="fileList"></div>
+    <div class="file-list" id="fileList">
+      </div>
     
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
-      <button class="btn-submit" id="submitBtn" onclick="submitUpload()">رفع الآن</button>
+      <button class="btn-submit" id="submitBtn" onclick="submitUpload()">تأكيد الرفع</button>
     </div>
   </div>
 </div>
 
 <div id="toast-container"></div>
 
-<div id="debug-console">
-  <div>> SYSTEM READY. TRIPLE CLICK TITLE TO TOGGLE.</div>
-</div>
-
 <script>
-  // =========================================================================
-  // CONFIGURATION
-  // =========================================================================
+  // ==========================================
+  // CONFIG
+  // ==========================================
   const API_URL = "https://script.google.com/macros/s/AKfycbx0_Hmdm2gucB87juLA_Rmzt1x8iL-ewnu3MsSf0SnEZQxqmN0e0I_1aktk_vw4j9kN/exec";
   
-  let currentUpload = { id: null, subject: null, files: [] };
+  let currentUpload = { id: null, subject: null, files: [] }; // Stores actual file data
+  let allLecturesData = {}; // Cache for search
 
-  // Initialize
-  document.addEventListener('DOMContentLoaded', fetchData);
-
-  // --- TRIPLE CLICK SECRET ---
-  let clickCount = 0;
-  const titleHeader = document.getElementById('main-header');
-  const debugConsole = document.getElementById('debug-console');
-
-  titleHeader.addEventListener('click', () => {
-    clickCount++;
-    if (clickCount === 3) {
-      debugConsole.style.display = (debugConsole.style.display === 'block') ? 'none' : 'block';
-      logToConsole("DEBUG MODE TOGGLED");
-      clickCount = 0;
+  // ==========================================
+  // THEME LOGIC
+  // ==========================================
+  function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const btn = document.getElementById('themeBtn');
+    if (savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      btn.innerText = '☀️';
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      btn.innerText = '🌙';
     }
-    setTimeout(() => clickCount = 0, 1000);
+  }
+
+  function toggleTheme() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const btn = document.getElementById('themeBtn');
+    if (isDark) {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('theme', 'light');
+      btn.innerText = '🌙';
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+      btn.innerText = '☀️';
+    }
+  }
+
+  // ==========================================
+  // DATA & RENDER
+  // ==========================================
+  document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    fetchData();
   });
-
-  function logToConsole(msg, type = 'normal') {
-    const line = document.createElement('div');
-    line.className = `log-line ${type}`;
-    line.innerText = `> ${msg}`;
-    debugConsole.appendChild(line);
-    debugConsole.scrollTop = debugConsole.scrollHeight; 
-  }
-
-  function showToast(msg, type = 'success') {
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    const icon = type === 'success' ? '✅' : '⚠️';
-    toast.innerHTML = `<span>${icon}</span> ${msg}`;
-    container.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(20px)';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-  }
-
-  // --- MAIN LOGIC ---
 
   async function fetchData() {
     try {
       const res = await fetch(API_URL);
       const data = await res.json();
+      allLecturesData = data;
       renderAll(data);
     } catch(e) {
-      console.error(e);
       document.getElementById('content-area').innerHTML = `
         <div style="text-align:center; color:var(--danger); padding:40px;">
-           <div style="font-size:40px; margin-bottom:10px;">🔌</div>
-           <b>حدث خطأ في الاتصال</b><br>
-           <button onclick="location.reload()" class="upload-btn" style="margin-top:15px;">إعادة المحاولة</button>
+           <h3>حدث خطأ في الاتصال</h3>
+           <button onclick="location.reload()" class="upload-btn">إعادة المحاولة</button>
         </div>`;
     }
   }
@@ -346,36 +380,43 @@
     Object.keys(subjectMap).forEach((subj, index) => {
       const subjectName = subjectMap[subj];
       const isActive = (index === 0) ? 'active-content' : '';
+      
+      // Card Structure
       const cardDiv = document.createElement('div');
       cardDiv.id = subj;
       cardDiv.className = `subject-content ${isActive}`;
       
-      let cardHTML = `<div class="subject-card"><div class="card-header">${subjectName}</div>`;
+      let cardHTML = `
+        <div class="subject-card">
+          <div class="card-header-area">
+            <div class="card-title">${subjectName}</div>
+            <div class="search-container">
+              <span class="search-icon">🔍</span>
+              <input type="text" class="search-input" placeholder="بحث عن محاضرة..." onkeyup="filterLectures(this, '${subj}')">
+            </div>
+          </div>
+      `;
+
       const subjectData = data[subj];
 
       if (!subjectData || Object.keys(subjectData).length === 0) {
-        cardHTML += `
-          <div style="padding:60px; text-align:center; color:var(--text-muted);">
-            <div style="font-size:40px; margin-bottom:10px;">🎉</div>
-            <div style="font-weight:600;">رائع! تم رفع جميع محاضرات ${subjectName}</div>
-          </div>`;
+        cardHTML += `<div style="padding:60px; text-align:center; color:var(--text-muted);">🎉 تم رفع جميع المحاضرات!</div>`;
       } else {
         for (const [grade, lectures] of Object.entries(subjectData)) {
           let rowsHTML = '';
           lectures.forEach(l => {
             rowsHTML += `
-              <tr id="row-${l.id}">
+              <tr class="lecture-row" data-search="${l.chapter} ${l.lecture}" id="row-${l.id}">
                 <td width="25%"><span class="chapter-badge">${l.chapter}</span></td>
                 <td><b>${l.lecture}</b></td>
-                <td style="text-align:center; width:120px;">
-                  <button class="upload-btn" onclick="openUploadModal('${l.id}', '${subj}', '${l.lecture}')">
-                    رفع 
-                  </button>
+                <td style="text-align:center; width:100px;">
+                  <button class="upload-btn" onclick="openUploadModal('${l.id}', '${subj}', '${l.lecture}')">رفع</button>
                 </td>
               </tr>`;
           });
+          
           cardHTML += `
-            <details open>
+            <details open class="grade-section">
               <summary>${grade}</summary>
               <div class="table-wrapper">
                 <table>
@@ -392,134 +433,190 @@
     });
   }
 
-  // --- UPLOAD HANDLERS ---
+  // ==========================================
+  // SEARCH LOGIC
+  // ==========================================
+  function filterLectures(input, subjId) {
+    const query = input.value.toLowerCase();
+    const container = document.getElementById(subjId);
+    const details = container.querySelectorAll('.grade-section');
 
-  window.openUploadModal = function(id, subject, title) {
-    currentUpload = { id: id, subject: subject, files: [] };
-    document.getElementById('modalSubtitle').innerText = `جاري الرفع لـ: ${title}`;
-    document.getElementById('fileList').innerHTML = '';
+    details.forEach(detail => {
+      const rows = detail.querySelectorAll('.lecture-row');
+      let hasMatch = false;
+
+      rows.forEach(row => {
+        const text = row.getAttribute('data-search').toLowerCase();
+        if (text.includes(query)) {
+          row.style.display = '';
+          hasMatch = true;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      // UX: Close section if no matches, Open if matches
+      if(query.length > 0) {
+        if(hasMatch) detail.setAttribute('open', '');
+        else detail.removeAttribute('open');
+        
+        // Hide entire detail if no rows match
+        detail.style.display = hasMatch ? '' : 'none';
+      } else {
+        detail.setAttribute('open', ''); // Reset to open on clear
+        detail.style.display = '';
+      }
+    });
+  }
+
+  // ==========================================
+  // FILE HANDLING (With Preview & Remove)
+  // ==========================================
+  
+  // This array stores objects: { fileObject, base64, id }
+  let selectedFilesStore = []; 
+
+  function openUploadModal(id, subject, title) {
+    currentUpload.id = id;
+    currentUpload.subject = subject;
+    selectedFilesStore = []; // Reset
+    renderFileList();
+    
+    document.getElementById('modalSubtitle').innerText = title;
     document.getElementById('fileInput').value = ''; 
     document.getElementById('uploadModal').classList.add('open');
-  };
+  }
 
-  window.closeModal = function() {
+  function closeModal() {
     document.getElementById('uploadModal').classList.remove('open');
-  };
+  }
 
-  window.handleFileSelect = function(input) {
-    const list = document.getElementById('fileList');
-    list.innerHTML = ''; 
-    currentUpload.files = [];
+  function handleFileSelect(input) {
+    const files = Array.from(input.files);
     
-    Array.from(input.files).forEach(file => {
+    files.forEach(file => {
       const reader = new FileReader();
       reader.onload = function(e) {
-        currentUpload.files.push({
+        selectedFilesStore.push({
+          id: Date.now() + Math.random(), // Unique temp ID
           name: file.name,
-          mimeType: file.type,
-          data: e.target.result.split(',')[1]
+          size: (file.size / 1024 / 1024).toFixed(2) + ' MB',
+          type: file.type,
+          data: e.target.result.split(',')[1], // Base64
+          preview: e.target.result // Full DataURL for preview
         });
+        renderFileList();
       };
       reader.readAsDataURL(file);
-      
+    });
+  }
+
+  function removeFile(tempId) {
+    selectedFilesStore = selectedFilesStore.filter(f => f.id !== tempId);
+    renderFileList();
+  }
+
+  function renderFileList() {
+    const list = document.getElementById('fileList');
+    list.innerHTML = '';
+
+    if(selectedFilesStore.length === 0) {
+      list.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:0.9rem;">لا توجد ملفات مختارة</div>';
+      return;
+    }
+
+    selectedFilesStore.forEach(file => {
+      const isImage = file.type.startsWith('image/');
+      const previewHTML = isImage 
+        ? `<img src="${file.preview}" class="file-preview">` 
+        : `<div class="file-preview">📄</div>`;
+
       const item = document.createElement('div');
       item.className = 'file-item';
       item.innerHTML = `
-        <span style="font-size:20px;">📄</span>
-        <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-            <b>${file.name}</b>
-        </div>`;
+        ${previewHTML}
+        <div class="file-info">
+          <div class="file-name">${file.name}</div>
+          <div class="file-size">${file.size}</div>
+        </div>
+        <button class="btn-remove" onclick="removeFile(${file.id})">✕</button>
+      `;
       list.appendChild(item);
     });
-  };
+  }
 
-  window.submitUpload = function() {
+  function submitUpload() {
+    if(selectedFilesStore.length === 0) { showToast("يرجى اختيار ملف", "error"); return; }
+
     const btn = document.getElementById('submitBtn');
-    if(currentUpload.files.length === 0) { 
-        showToast("يرجى اختيار ملف واحد على الأقل", "error");
-        return; 
-    }
-
     btn.innerHTML = '<div class="spinner"></div>';
     btn.disabled = true;
-    logToConsole("Starting Upload...", "normal");
+
+    // Prepare payload
+    const payload = {
+      id: currentUpload.id,
+      subject: currentUpload.subject,
+      files: selectedFilesStore.map(f => ({
+        name: f.name,
+        mimeType: f.type,
+        data: f.data
+      }))
+    };
 
     fetch(API_URL, {
       method: "POST",
-      body: JSON.stringify(currentUpload)
+      body: JSON.stringify(payload)
     })
-    .then(response => response.json())
+    .then(r => r.json())
     .then(data => {
-       // --- PRINT SERVER LOGS ---
-       if (data.logs && data.logs.length > 0) {
-         data.logs.forEach(log => logToConsole(log));
-       }
-
-       if (data.status === "error") {
-         showToast(data.message, "error");
-         logToConsole("ERROR: " + data.message, "error");
-         btn.innerHTML = 'رفع الآن';
-         btn.disabled = false;
-         return;
-       }
-
-       showToast("تم الرفع بنجاح!", "success");
-       logToConsole("Upload Success!", "success");
-       closeModal();
-       btn.innerHTML = 'رفع الآن';
-       btn.disabled = false;
-       
-       // Smooth Remove Animation
-       const row = document.getElementById(`row-${currentUpload.id}`);
-       if(row) {
-         row.style.transition = 'all 0.5s ease';
-         row.style.transform = 'translateX(-20px)';
-         row.style.opacity = '0';
-         setTimeout(() => {
-           const tbody = row.parentElement;
-           row.remove();
-           // Check if group is empty
-           if (tbody.children.length === 0) {
-              const details = tbody.closest('details'); 
-              const card = details.parentElement;  
-              details.style.opacity = '0';
-              setTimeout(() => {
-                  details.remove();
-                  if (card.querySelectorAll('details').length === 0) {
-                      card.innerHTML = `
-                      <div style="padding:60px; text-align:center; color:var(--text-muted);">
-                        <div style="font-size:40px; margin-bottom:10px;">🎉</div>
-                        <div style="font-weight:600;">تم الانتهاء من هذا القسم!</div>
-                      </div>`;
-                  }
-              }, 300);
-           }
-         }, 500);
-       }
+      if (data.status === "error") {
+        showToast(data.message, "error");
+        btn.innerHTML = 'تأكيد الرفع';
+        btn.disabled = false;
+      } else {
+        showToast("تم الرفع بنجاح", "success");
+        closeModal();
+        btn.innerHTML = 'تأكيد الرفع';
+        btn.disabled = false;
+        animate removal(currentUpload.id);
+      }
     })
-    .catch(err => {
-      console.error(err);
-      logToConsole("FETCH ERROR: " + err.toString(), "error");
-      showToast("فشل الاتصال بالسيرفر", "error");
-      btn.innerHTML = 'رفع الآن';
+    .catch(e => {
+      showToast("فشل الاتصال", "error");
+      btn.innerHTML = 'تأكيد الرفع';
       btn.disabled = false;
     });
-  };
+  }
 
-  window.switchTab = function(id) {
-    document.querySelectorAll('.subject-content').forEach(c => {
-        c.classList.remove('active-content');
-        c.style.animation = 'none';
-        c.offsetHeight; /* trigger reflow */
-        c.style.animation = null; 
-    });
+  function animate removal(id) {
+    const row = document.getElementById(`row-${id}`);
+    if(row) {
+      row.style.opacity = '0';
+      setTimeout(() => {
+        const tbody = row.parentElement;
+        row.remove();
+        if(tbody.children.length === 0) {
+            tbody.closest('details').remove();
+        }
+      }, 500);
+    }
+  }
+
+  function showToast(msg, type) {
+    const container = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<span>${type==='success'?'✅':'⚠️'}</span> ${msg}`;
+    container.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3000);
+  }
+
+  function switchTab(id) {
+    document.querySelectorAll('.subject-content').forEach(c => c.classList.remove('active-content'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    
     document.getElementById(id).classList.add('active-content');
-    // Find the button that was clicked based on text or onclick attribute matches if needed, 
-    // but simpler to just use event target if available
     if(event && event.target) event.target.classList.add('active');
-  };
+  }
 </script>
 </body>
 </html>
