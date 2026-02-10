@@ -4,68 +4,229 @@
   <meta charset="UTF-8" />
   <title>نظام متابعة المحاضرات</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #f4f6fb; --card: #ffffff; --primary: #2f3a8f; --secondary: #e9ecff; --text: #1f2937; --muted: #6b7280; --border: #e5e7eb; --radius: 14px; --success: #10b981; }
-    body { margin: 0; font-family: "Cairo", sans-serif; background: var(--bg); color: var(--text); }
-    .container { max-width: 1100px; margin: auto; padding: 32px 20px 60px; }
-    header { text-align: center; margin-bottom: 30px; cursor: pointer; user-select: none; }
-    .tabs-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px; background: #fff; padding: 15px; border-radius: var(--radius); }
-    .tab-btn { background: transparent; border: 2px solid var(--secondary); color: var(--muted); padding: 8px 16px; border-radius: 50px; font-family: "Cairo"; font-weight: 700; cursor: pointer; }
-    .tab-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
-    .subject-content { display: none; }
-    .active-content { display: block; }
-    .subject-card { background: var(--card); border-radius: var(--radius); margin-bottom: 20px; border: 1px solid var(--border); overflow: hidden; }
-    .card-header { padding: 15px 20px; font-weight: 700; color: var(--primary); background: linear-gradient(135deg, var(--secondary), #ffffff); border-bottom: 1px solid var(--border); }
-    details { border-bottom: 1px solid var(--border); }
-    summary { cursor: pointer; padding: 15px 20px; font-weight: 600; display: flex; justify-content: space-between; }
-    table { width: 100%; border-collapse: collapse; min-width: 500px; }
-    th, td { padding: 14px 20px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    th.chapter-col { width: 25%; color: var(--primary); background: #fcfcfc; }
-    .upload-btn { background: var(--secondary); color: var(--primary); border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: "Cairo"; font-weight: bold; }
-    .upload-btn:hover { background: var(--primary); color: white; }
-    .table-wrapper { overflow-x: auto; }
-    
-    /* MODAL STYLES */
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-    .modal-overlay.open { display: flex; }
-    .modal-card { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; }
-    .modal-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 20px; color: var(--primary); }
-    .file-drop-area { border: 2px dashed var(--secondary); padding: 30px; text-align: center; border-radius: 10px; margin-bottom: 20px; cursor: pointer; transition: 0.3s; }
-    .file-drop-area:hover { border-color: var(--primary); background: #fafbff; }
-    .file-input { display: none; }
-    .file-list { margin-bottom: 20px; max-height: 150px; overflow-y: auto; font-size: 0.9rem; }
-    .file-item { display: flex; justify-content: space-between; padding: 8px; background: #f8f9fa; margin-bottom: 5px; border-radius: 6px; }
-    .modal-actions { display: flex; gap: 10px; }
-    .btn-submit { flex: 2; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-family: "Cairo"; font-weight: bold; cursor: pointer; }
-    .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
-    .btn-cancel { flex: 1; background: transparent; border: 1px solid #ddd; color: #666; border-radius: 10px; cursor: pointer; font-family: "Cairo"; }
-    
-    .spinner { width: 20px; height: 20px; border: 3px solid #ffffff33; border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: auto; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    /* SECRET DEBUG TERMINAL */
-    #debug-console {
-      display: none; 
-      position: fixed; bottom: 0; left: 0; width: 100%; height: 200px;
-      background: #0d1117; color: #00ff41; font-family: 'Courier New', monospace;
-      padding: 10px; overflow-y: auto; z-index: 9999;
-      border-top: 3px solid #00ff41; direction: ltr; text-align: left; font-size: 12px;
+    :root {
+      --bg: #f0f2f5;
+      --surface: #ffffff;
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #eef2ff;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --radius: 16px;
+      --success: #10b981;
+      --danger: #ef4444;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     }
+
+    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+    
+    body { 
+      margin: 0; 
+      font-family: "Cairo", sans-serif; 
+      background: var(--bg); 
+      color: var(--text-main); 
+      overflow-x: hidden;
+    }
+
+    .container { max-width: 1000px; margin: auto; padding: 40px 20px 80px; }
+
+    /* HEADER */
+    header { text-align: center; margin-bottom: 40px; cursor: pointer; user-select: none; }
+    header h1 { margin: 0; font-size: 2rem; color: var(--primary); font-weight: 800; letter-spacing: -0.5px; }
+    header p { margin: 8px 0 0; color: var(--text-muted); font-size: 1rem; }
+
+    /* TABS */
+    .tabs-wrapper {
+      background: var(--surface);
+      padding: 10px;
+      border-radius: 50px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 30px;
+      position: sticky;
+      top: 20px;
+      z-index: 90;
+    }
+    
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-family: "Cairo";
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+    
+    .tab-btn:hover { background: var(--secondary); color: var(--primary); }
+    .tab-btn.active { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3); }
+
+    /* CONTENT CARDS */
+    .subject-content { display: none; animation: fadeIn 0.4s ease forwards; }
+    .active-content { display: block; }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .subject-card { 
+      background: var(--surface); 
+      border-radius: var(--radius); 
+      box-shadow: var(--shadow); 
+      overflow: hidden; 
+      margin-bottom: 25px; 
+    }
+
+    .card-header {
+      padding: 20px 24px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(to left, #fff, var(--secondary));
+    }
+
+    /* ACCORDION (DETAILS/SUMMARY) */
+    details { border-bottom: 1px solid var(--border); transition: all 0.3s ease; }
+    details[open] { background: #fdfdfd; }
+    details:last-child { border-bottom: none; }
+
+    summary {
+      cursor: pointer;
+      padding: 18px 24px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      list-style: none;
+      transition: background 0.2s;
+    }
+    summary:hover { background: #f9fafb; }
+    summary::-webkit-details-marker { display: none; }
+    
+    summary::after {
+      content: '❮'; /* Chevron */
+      font-size: 14px;
+      color: var(--text-muted);
+      transition: transform 0.3s ease;
+      transform: rotate(90deg);
+    }
+    details[open] summary::after { transform: rotate(-90deg); color: var(--primary); }
+
+    /* TABLES */
+    .table-wrapper { overflow-x: auto; padding-bottom: 5px; }
+    
+    /* Custom Scrollbar */
+    .table-wrapper::-webkit-scrollbar { height: 6px; }
+    .table-wrapper::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+    
+    table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    th { text-align: right; color: var(--text-muted); font-size: 0.85rem; padding: 12px 24px; background: #f8fafc; font-weight: 600; }
+    td { padding: 16px 24px; border-top: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    
+    .chapter-badge {
+      display: inline-block;
+      background: var(--secondary);
+      color: var(--primary);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    /* BUTTONS */
+    .upload-btn {
+      background: white;
+      border: 2px solid var(--secondary);
+      color: var(--primary);
+      padding: 8px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: "Cairo";
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: 0.2s;
+    }
+    .upload-btn:hover { background: var(--primary); border-color: var(--primary); color: white; transform: translateY(-2px); }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+      z-index: 1000; justify-content: center; align-items: center;
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    .modal-overlay.open { display: flex; opacity: 1; }
+    
+    .modal-card {
+      background: white; padding: 32px; border-radius: 24px; width: 90%; max-width: 480px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .modal-overlay.open .modal-card { transform: scale(1); }
+
+    .modal-title { font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 5px; }
+    .modal-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; }
+
+    .file-drop-area {
+      border: 2px dashed #cbd5e1; background: #f8fafc;
+      padding: 40px 20px; text-align: center; border-radius: 16px;
+      cursor: pointer; transition: 0.3s;
+    }
+    .file-drop-area:hover { border-color: var(--primary); background: #f0f4ff; }
+    
+    .file-list { margin-top: 15px; max-height: 120px; overflow-y: auto; }
+    .file-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px; background: #fff; border: 1px solid var(--border);
+      border-radius: 10px; margin-bottom: 8px; font-size: 0.9rem;
+    }
+
+    .modal-actions { display: flex; gap: 12px; margin-top: 25px; }
+    .btn-submit { flex: 2; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-family: "Cairo"; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem; }
+    .btn-submit:hover:not(:disabled) { background: var(--primary-dark); }
+    .btn-submit:disabled { background: #cbd5e1; cursor: not-allowed; }
+    .btn-cancel { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 12px; cursor: pointer; font-family: "Cairo"; font-weight: 600; }
+    .btn-cancel:hover { background: #f9fafb; }
+
+    /* TOAST NOTIFICATION */
+    #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+    .toast {
+      background: #333; color: white; padding: 12px 24px; border-radius: 50px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-size: 0.9rem; font-weight: 600;
+      display: flex; align-items: center; gap: 10px; animation: slideUp 0.3s ease forwards;
+    }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* SPINNER */
+    .spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin: auto; }
+    .page-loader { width: 40px; height: 40px; border-color: var(--secondary); border-top-color: var(--primary); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* DEBUG */
+    #debug-console { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 200px; background: #111; color: #0f0; font-family: monospace; padding: 10px; overflow-y: auto; z-index: 9999; font-size: 12px; direction: ltr; text-align: left; opacity: 0.95; }
     .log-line { border-bottom: 1px solid #333; padding: 2px 0; }
-    .log-line.error { color: #ff4d4d; }
-    .log-line.success { color: #00ff41; }
+    .log-line.error { color: #ff5555; }
   </style>
 </head>
 <body>
 
 <div class="container">
   <header id="main-header">
-    <h1>متابعة رفع الأسئلة</h1>
-    <p>نظام المزامنة ورفع الملفات</p>
+    <h1>نظام متابعة الأسئلة</h1>
+    <p>إدارة ومزامنة ملفات المحاضرات</p>
   </header>
 
-  <div class="tabs-container">
+  <div class="tabs-wrapper">
     <button class="tab-btn active" onclick="switchTab('chemistry')">الكيمياء</button>
     <button class="tab-btn" onclick="switchTab('biology')">الأحياء</button>
     <button class="tab-btn" onclick="switchTab('math')">الرياضيات</button>
@@ -75,33 +236,35 @@
   </div>
 
   <div id="content-area">
-      <div style="text-align:center; padding: 20px;">
-          <div class="spinner" style="border-color: #2f3a8f; border-top-color: transparent;"></div>
-          <p style="margin-top:10px; color:#666;">جاري تحميل البيانات...</p>
+      <div style="text-align:center; padding: 80px 20px;">
+          <div class="spinner page-loader"></div>
+          <p style="margin-top:15px; color:var(--text-muted); font-weight:600;">جاري جلب البيانات من السيرفر...</p>
       </div>
   </div>
 </div>
 
 <div class="modal-overlay" id="uploadModal">
   <div class="modal-card">
-    <div class="modal-title">رفع ملفات المحاضرة</div>
-    <div id="modalSubtitle" style="margin-bottom:15px; font-size:0.9rem; color:#666;"></div>
+    <div class="modal-title">رفع الملفات</div>
+    <div id="modalSubtitle" class="modal-subtitle"></div>
     
     <div class="file-drop-area" onclick="document.getElementById('fileInput').click()">
-      <span style="font-size:24px">📂</span><br>
-      اضغط لاختيار الملفات<br>
-      <span style="font-size:12px; color:#999">PDF, Images, Word</span>
+      <div style="font-size:32px; margin-bottom:10px;">☁️</div>
+      <div style="font-weight:700; color:var(--primary)">اضغط لاختيار الملفات</div>
+      <div style="font-size:12px; color:#94a3b8; margin-top:5px;">يدعم الصور و PDF</div>
     </div>
-    <input type="file" id="fileInput" class="file-input" multiple onchange="handleFileSelect(this)">
+    <input type="file" id="fileInput" hidden multiple onchange="handleFileSelect(this)">
     
     <div class="file-list" id="fileList"></div>
     
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
-      <button class="btn-submit" id="submitBtn" onclick="submitUpload()">تأكيد الرفع</button>
+      <button class="btn-submit" id="submitBtn" onclick="submitUpload()">رفع الآن</button>
     </div>
   </div>
 </div>
+
+<div id="toast-container"></div>
 
 <div id="debug-console">
   <div>> SYSTEM READY. TRIPLE CLICK TITLE TO TOGGLE.</div>
@@ -109,11 +272,10 @@
 
 <script>
   // =========================================================================
-  // PASTE YOUR NEWEST DEPLOYMENT URL HERE
+  // CONFIGURATION
   // =========================================================================
   const API_URL = "https://script.google.com/macros/s/AKfycbx0_Hmdm2gucB87juLA_Rmzt1x8iL-ewnu3MsSf0SnEZQxqmN0e0I_1aktk_vw4j9kN/exec";
-  // =========================================================================
-
+  
   let currentUpload = { id: null, subject: null, files: [] };
 
   // Initialize
@@ -142,6 +304,20 @@
     debugConsole.scrollTop = debugConsole.scrollHeight; 
   }
 
+  function showToast(msg, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    const icon = type === 'success' ? '✅' : '⚠️';
+    toast.innerHTML = `<span>${icon}</span> ${msg}`;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
   // --- MAIN LOGIC ---
 
   async function fetchData() {
@@ -152,9 +328,10 @@
     } catch(e) {
       console.error(e);
       document.getElementById('content-area').innerHTML = `
-        <div style="text-align:center; color:red; padding:30px;">
-           حدث خطأ في الاتصال بالسيرفر.<br>
-           <button onclick="location.reload()" style="margin-top:10px;">إعادة المحاولة</button>
+        <div style="text-align:center; color:var(--danger); padding:40px;">
+           <div style="font-size:40px; margin-bottom:10px;">🔌</div>
+           <b>حدث خطأ في الاتصال</b><br>
+           <button onclick="location.reload()" class="upload-btn" style="margin-top:15px;">إعادة المحاولة</button>
         </div>`;
     }
   }
@@ -178,23 +355,34 @@
       const subjectData = data[subj];
 
       if (!subjectData || Object.keys(subjectData).length === 0) {
-        cardHTML += `<div style="padding:40px; text-align:center; color:#888;"><span style="font-size:30px;">🎉</span><br>تم رفع كل محاضرات ${subjectName}!</div>`;
+        cardHTML += `
+          <div style="padding:60px; text-align:center; color:var(--text-muted);">
+            <div style="font-size:40px; margin-bottom:10px;">🎉</div>
+            <div style="font-weight:600;">رائع! تم رفع جميع محاضرات ${subjectName}</div>
+          </div>`;
       } else {
         for (const [grade, lectures] of Object.entries(subjectData)) {
           let rowsHTML = '';
           lectures.forEach(l => {
             rowsHTML += `
               <tr id="row-${l.id}">
-                <td class="chapter-col">${l.chapter}</td>
-                <td>${l.lecture}</td>
-                <td style="text-align:center"><button class="upload-btn" onclick="openUploadModal('${l.id}', '${subj}', '${l.lecture}')">رفع</button></td>
+                <td width="25%"><span class="chapter-badge">${l.chapter}</span></td>
+                <td><b>${l.lecture}</b></td>
+                <td style="text-align:center; width:120px;">
+                  <button class="upload-btn" onclick="openUploadModal('${l.id}', '${subj}', '${l.lecture}')">
+                    رفع 📤
+                  </button>
+                </td>
               </tr>`;
           });
           cardHTML += `
-            <details>
+            <details open>
               <summary>${grade}</summary>
               <div class="table-wrapper">
-                <table><thead><tr><th class="chapter-col">الفصل</th><th>المحاضرة</th><th style="width:100px">إجراء</th></tr></thead><tbody>${rowsHTML}</tbody></table>
+                <table>
+                  <thead><tr><th>الفصل</th><th>المحاضرة</th><th style="text-align:center">إجراء</th></tr></thead>
+                  <tbody>${rowsHTML}</tbody>
+                </table>
               </div>
             </details>`;
         }
@@ -209,7 +397,7 @@
 
   window.openUploadModal = function(id, subject, title) {
     currentUpload = { id: id, subject: subject, files: [] };
-    document.getElementById('modalSubtitle').innerText = title;
+    document.getElementById('modalSubtitle').innerText = `جاري الرفع لـ: ${title}`;
     document.getElementById('fileList').innerHTML = '';
     document.getElementById('fileInput').value = ''; 
     document.getElementById('uploadModal').classList.add('open');
@@ -223,6 +411,7 @@
     const list = document.getElementById('fileList');
     list.innerHTML = ''; 
     currentUpload.files = [];
+    
     Array.from(input.files).forEach(file => {
       const reader = new FileReader();
       reader.onload = function(e) {
@@ -233,16 +422,24 @@
         });
       };
       reader.readAsDataURL(file);
+      
       const item = document.createElement('div');
       item.className = 'file-item';
-      item.innerText = `📄 ${file.name}`;
+      item.innerHTML = `
+        <span style="font-size:20px;">📄</span>
+        <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            <b>${file.name}</b>
+        </div>`;
       list.appendChild(item);
     });
   };
 
   window.submitUpload = function() {
     const btn = document.getElementById('submitBtn');
-    if(currentUpload.files.length === 0) { alert("يرجى اختيار ملف واحد على الأقل"); return; }
+    if(currentUpload.files.length === 0) { 
+        showToast("يرجى اختيار ملف واحد على الأقل", "error");
+        return; 
+    }
 
     btn.innerHTML = '<div class="spinner"></div>';
     btn.disabled = true;
@@ -260,32 +457,43 @@
        }
 
        if (data.status === "error") {
-         alert("خطأ: " + data.message);
+         showToast(data.message, "error");
          logToConsole("ERROR: " + data.message, "error");
-         btn.innerHTML = 'تأكيد الرفع';
+         btn.innerHTML = 'رفع الآن';
          btn.disabled = false;
          return;
        }
 
+       showToast("تم الرفع بنجاح!", "success");
        logToConsole("Upload Success!", "success");
        closeModal();
-       btn.innerHTML = 'تأكيد الرفع';
+       btn.innerHTML = 'رفع الآن';
        btn.disabled = false;
        
+       // Smooth Remove Animation
        const row = document.getElementById(`row-${currentUpload.id}`);
        if(row) {
-         row.style.transition = 'all 0.5s';
+         row.style.transition = 'all 0.5s ease';
+         row.style.transform = 'translateX(-20px)';
          row.style.opacity = '0';
          setTimeout(() => {
            const tbody = row.parentElement;
            row.remove();
+           // Check if group is empty
            if (tbody.children.length === 0) {
-              const details = tbody.closest('.table-wrapper').parentElement; 
+              const details = tbody.closest('details'); 
               const card = details.parentElement;  
-              details.remove();
-              if (card.querySelectorAll('details').length === 0) {
-                  card.innerHTML = `<div style="padding:40px; text-align:center; color:#888;">🎉<br>عاش، تم رفع الكل!</div>`;
-              }
+              details.style.opacity = '0';
+              setTimeout(() => {
+                  details.remove();
+                  if (card.querySelectorAll('details').length === 0) {
+                      card.innerHTML = `
+                      <div style="padding:60px; text-align:center; color:var(--text-muted);">
+                        <div style="font-size:40px; margin-bottom:10px;">🎉</div>
+                        <div style="font-weight:600;">تم الانتهاء من هذا القسم!</div>
+                      </div>`;
+                  }
+              }, 300);
            }
          }, 500);
        }
@@ -293,16 +501,24 @@
     .catch(err => {
       console.error(err);
       logToConsole("FETCH ERROR: " + err.toString(), "error");
-      alert("فشل الاتصال: " + err.toString());
-      btn.innerHTML = 'تأكيد الرفع';
+      showToast("فشل الاتصال بالسيرفر", "error");
+      btn.innerHTML = 'رفع الآن';
       btn.disabled = false;
     });
   };
 
   window.switchTab = function(id) {
-    document.querySelectorAll('.subject-content').forEach(c => c.classList.remove('active-content'));
+    document.querySelectorAll('.subject-content').forEach(c => {
+        c.classList.remove('active-content');
+        c.style.animation = 'none';
+        c.offsetHeight; /* trigger reflow */
+        c.style.animation = null; 
+    });
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    
     document.getElementById(id).classList.add('active-content');
+    // Find the button that was clicked based on text or onclick attribute matches if needed, 
+    // but simpler to just use event target if available
     if(event && event.target) event.target.classList.add('active');
   };
 </script>
