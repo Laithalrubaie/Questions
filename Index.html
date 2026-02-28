@@ -2,638 +2,1267 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>نظام متابعة المحاضرات</title>
+  <title>نظام متابعة الأسئلة</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f0f2f5;
+      --bg: #f4f6fb;
       --surface: #ffffff;
-      --primary: #4361ee;
-      --primary-dark: #3a56d4;
-      --secondary: #eef2ff;
-      --text-main: #1f2937;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #eff6ff;
+      --secondary: #f0f4ff;
+      --text-main: #111827;
       --text-muted: #6b7280;
+      --text-light: #9ca3af;
       --border: #e5e7eb;
-      --radius: 16px;
-      --success: #10b981;
-      --danger: #ef4444;
-      --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      --border-focus: #93c5fd;
+      --radius: 18px;
+      --radius-sm: 10px;
+      --success: #059669;
+      --success-bg: #ecfdf5;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --warning: #d97706;
+      --warning-bg: #fffbeb;
+      --shadow: 0 2px 12px rgba(0,0,0,0.07);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.13);
     }
 
-    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
     
     body { 
-      margin: 0; 
       font-family: "Cairo", sans-serif; 
       background: var(--bg); 
       color: var(--text-main); 
       overflow-x: hidden;
+      min-height: 100vh;
     }
 
-    .container { max-width: 1000px; margin: auto; padding: 40px 20px 80px; }
+    /* ===== LAYOUT ===== */
+    .container { max-width: 1020px; margin: auto; padding: 30px 16px 100px; }
 
-    /* HEADER */
-    header { text-align: center; margin-bottom: 40px; cursor: pointer; user-select: none; }
-    header h1 { margin: 0; font-size: 2rem; color: var(--primary); font-weight: 800; letter-spacing: -0.5px; }
-    header p { margin: 8px 0 0; color: var(--text-muted); font-size: 1rem; }
+    /* ===== HEADER ===== */
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+      cursor: pointer;
+      user-select: none;
+      padding: 32px 20px 24px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary), #60a5fa, var(--primary));
+    }
+    header h1 {
+      font-size: 1.9rem;
+      color: var(--primary);
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+    header p {
+      margin: 8px 0 0;
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-top: 12px;
+    }
 
-    /* TABS */
+    /* ===== HELP BANNER ===== */
+    .help-banner {
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border: 1.5px solid #bfdbfe;
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .help-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+    .help-text h3 { font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+    .help-text p { font-size: 0.88rem; color: #374151; line-height: 1.7; }
+
+    /* ===== TABS ===== */
     .tabs-wrapper {
       background: var(--surface);
       padding: 10px;
-      border-radius: 50px;
+      border-radius: 60px;
       box-shadow: var(--shadow);
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 8px;
-      margin-bottom: 30px;
+      gap: 6px;
+      margin-bottom: 28px;
       position: sticky;
-      top: 20px;
+      top: 14px;
       z-index: 90;
     }
-    
     .tab-btn {
       background: transparent;
       border: none;
       color: var(--text-muted);
-      padding: 10px 20px;
+      padding: 11px 22px;
       border-radius: 40px;
       font-family: "Cairo";
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
       font-size: 0.95rem;
+      position: relative;
     }
-    
     .tab-btn:hover { background: var(--secondary); color: var(--primary); }
-    .tab-btn.active { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3); }
-
-    /* CONTENT CARDS */
-    .subject-content { display: none; animation: fadeIn 0.4s ease forwards; }
-    .active-content { display: block; }
-    
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    .subject-card { 
-      background: var(--surface); 
-      border-radius: var(--radius); 
-      box-shadow: var(--shadow); 
-      overflow: hidden; 
-      margin-bottom: 25px; 
+    .tab-btn.active { background: var(--primary); color: #fff; box-shadow: 0 4px 16px rgba(37,99,235,0.35); }
+    .tab-badge {
+      position: absolute;
+      top: 4px; left: 4px;
+      background: #ef4444;
+      color: white;
+      font-size: 0.65rem;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800;
     }
 
+    /* ===== CONTENT ===== */
+    .subject-content { display: none; animation: fadeIn 0.35s ease forwards; }
+    .active-content { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    .subject-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 22px; }
     .card-header {
-      padding: 20px 24px;
+      padding: 18px 24px;
       font-size: 1.1rem;
-      font-weight: 700;
+      font-weight: 800;
       color: var(--primary);
       border-bottom: 1px solid var(--border);
       background: linear-gradient(to left, #fff, var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-count {
+      background: var(--primary);
+      color: white;
+      font-size: 0.8rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-weight: 700;
     }
 
-    /* SEARCH BAR */
-    .search-bar {
-      padding: 10px 20px 14px;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-    }
+    /* ===== SEARCH ===== */
+    .search-bar { padding: 12px 18px 14px; border-bottom: 1px solid var(--border); }
+    .search-wrap { position: relative; }
+    .search-icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 15px; pointer-events: none; }
     .search-input {
       width: 100%;
-      padding: 9px 14px;
+      padding: 11px 40px 11px 16px;
       border-radius: 999px;
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       font-family: "Cairo";
       font-size: 0.9rem;
-      background: white;
+      background: var(--bg);
       color: var(--text-main);
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .search-input::placeholder {
-      color: var(--text-muted);
-    }
-    .search-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
-      outline: none;
-    }
+    .search-input::placeholder { color: var(--text-light); }
+    .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); background: white; }
 
-    /* ACCORDION (DETAILS/SUMMARY) */
-    details { border-bottom: 1px solid var(--border); transition: all 0.3s ease; }
-    details[open] { background: #fdfdfd; }
+    /* ===== ACCORDION ===== */
+    details { border-bottom: 1px solid var(--border); }
+    details[open] { background: #fafbff; }
     details:last-child { border-bottom: none; }
-
     summary {
       cursor: pointer;
-      padding: 18px 24px;
-      font-weight: 600;
+      padding: 16px 22px;
+      font-weight: 700;
+      font-size: 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       list-style: none;
       transition: background 0.2s;
+      color: #1e3a8a;
     }
-    summary:hover { background: #f9fafb; }
+    summary:hover { background: #f0f4ff; }
     summary::-webkit-details-marker { display: none; }
-    
-    summary::after {
-      content: '❮';
-      font-size: 14px;
-      color: var(--text-muted);
-      transition: transform 0.3s ease;
-      transform: rotate(90deg);
-    }
-    details[open] summary::after { transform: rotate(-90deg); color: var(--primary); }
-
-    /* TABLES */
-    .table-wrapper { overflow-x: auto; padding-bottom: 5px; }
-    
-    /* Custom Scrollbar */
-    .table-wrapper::-webkit-scrollbar { height: 6px; }
-    .table-wrapper::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-    
-    table { width: 100%; border-collapse: collapse; min-width: 600px; }
-    th { text-align: right; color: var(--text-muted); font-size: 0.85rem; padding: 12px 24px; background: #f8fafc; font-weight: 600; }
-    td { padding: 16px 24px; border-top: 1px solid var(--border); vertical-align: middle; }
-    tr:last-child td { border-bottom: none; }
-    
-    .chapter-badge {
-      display: inline-block;
-      background: var(--secondary);
-      color: var(--primary);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 0.85rem;
+    summary::after { content: '▾'; font-size: 16px; color: var(--text-muted); transition: transform 0.3s ease; }
+    details[open] summary::after { transform: rotate(-180deg); color: var(--primary); }
+    .grade-badge {
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 3px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
       font-weight: 700;
     }
 
-    /* BUTTONS */
-    .upload-btn {
-      background: white;
-      border: 2px solid var(--secondary);
-      color: var(--primary);
-      padding: 8px 18px;
-      border-radius: 10px;
+    /* ===== TABLE ===== */
+    .table-wrapper { overflow-x: auto; }
+    .table-wrapper::-webkit-scrollbar { height: 5px; }
+    .table-wrapper::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+    table { width: 100%; border-collapse: collapse; min-width: 560px; }
+    th { text-align: right; color: var(--text-muted); font-size: 0.82rem; padding: 11px 22px; background: #f8fafc; font-weight: 700; border-bottom: 1.5px solid var(--border); }
+    td { padding: 15px 22px; border-top: 1px solid var(--border); vertical-align: middle; font-size: 0.95rem; }
+    tr:hover td { background: #f9fbff; }
+    .chapter-badge { display: inline-block; background: #ede9fe; color: #6d28d9; padding: 4px 10px; border-radius: 6px; font-size: 0.82rem; font-weight: 700; }
+    .row-num { color: var(--text-light); font-size: 0.82rem; font-weight: 700; }
+
+    /* ===== ACTION BUTTONS ===== */
+    .action-cell { display: flex; gap: 8px; justify-content: center; }
+    .btn-upload {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 9px 18px;
+      border-radius: var(--radius-sm);
       cursor: pointer;
       font-family: "Cairo";
       font-weight: 700;
-      font-size: 0.9rem;
-      transition: 0.2s;
+      font-size: 0.88rem;
+      transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
     }
-    .upload-btn:hover { background: var(--primary); border-color: var(--primary); color: white; transform: translateY(-2px); }
+    .btn-upload:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+    .btn-questions {
+      background: #7c3aed;
+      color: white;
+      border: none;
+      padding: 9px 18px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: "Cairo";
+      font-weight: 700;
+      font-size: 0.88rem;
+      transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-questions:hover { background: #6d28d9; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
 
-    /* MODAL */
+    /* ===== UPLOAD MODAL ===== */
     .modal-overlay {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+      background: rgba(0,0,0,0.55); backdrop-filter: blur(5px);
       z-index: 1000; justify-content: center; align-items: center;
-      opacity: 0; transition: opacity 0.3s ease;
     }
-    .modal-overlay.open { display: flex; opacity: 1; }
-    
+    .modal-overlay.open { display: flex; }
     .modal-card {
-      background: white; padding: 32px; border-radius: 24px; width: 90%; max-width: 480px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: white;
+      border-radius: 24px;
+      width: 92%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
-    .modal-overlay.open .modal-card { transform: scale(1); }
+    @keyframes popIn { from { transform: scale(0.88); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal-header {
+      padding: 26px 28px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-title { font-size: 1.35rem; font-weight: 900; color: var(--text-main); }
+    .modal-subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; line-height: 1.5; }
+    .modal-body { padding: 22px 28px; }
+    .modal-footer { padding: 18px 28px; border-top: 1px solid var(--border); display: flex; gap: 12px; }
 
-    .modal-title { font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 5px; }
-    .modal-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; }
+    .upload-step {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-bottom: 14px;
+      border: 1.5px solid var(--border);
+    }
+    .upload-step-label {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step-num {
+      width: 22px; height: 22px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
 
     .file-drop-area {
-      border: 2px dashed #cbd5e1; background: #f8fafc;
-      padding: 40px 20px; text-align: center; border-radius: 16px;
-      cursor: pointer; transition: 0.3s;
+      border: 2px dashed #c7d2fe;
+      background: #eff6ff;
+      padding: 32px 20px;
+      text-align: center;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s;
     }
-    .file-drop-area:hover { border-color: var(--primary); background: #f0f4ff; }
-    
-    .file-list { margin-top: 15px; max-height: 120px; overflow-y: auto; }
+    .file-drop-area:hover { border-color: var(--primary); background: #dbeafe; }
+    .file-drop-icon { font-size: 36px; margin-bottom: 8px; }
+    .file-drop-label { font-weight: 800; color: var(--primary); font-size: 1rem; }
+    .file-drop-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+    .file-list { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
     .file-item {
       display: flex; align-items: center; gap: 10px;
-      padding: 10px; background: #fff; border: 1px solid var(--border);
-      border-radius: 10px; margin-bottom: 8px; font-size: 0.9rem;
+      padding: 10px 12px;
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.88rem;
     }
-
-    .file-thumb {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      object-fit: cover;
-      border: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-
-    .file-icon {
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-
+    .file-thumb { width: 38px; height: 38px; border-radius: 7px; object-fit: cover; border: 1px solid var(--border); flex-shrink: 0; }
+    .file-icon { font-size: 22px; flex-shrink: 0; }
+    .file-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
     .file-remove-btn {
-      border: none;
-      background: transparent;
-      color: var(--danger);
-      font-family: "Cairo";
-      font-size: 0.8rem;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 999px;
-      flex-shrink: 0;
-      transition: background 0.15s ease, transform 0.1s ease;
+      border: none; background: transparent; color: var(--danger);
+      font-family: "Cairo"; font-size: 0.8rem; cursor: pointer;
+      padding: 4px 8px; border-radius: 6px; flex-shrink: 0;
+      transition: background 0.15s;
     }
+    .file-remove-btn:hover { background: var(--danger-bg); }
 
-    .file-remove-btn:hover {
-      background: rgba(239, 68, 68, 0.08);
-      transform: translateY(-1px);
+    /* ===== BUTTONS ===== */
+    .btn-primary {
+      flex: 2; background: var(--primary); color: white; border: none;
+      padding: 14px; border-radius: 12px; font-family: "Cairo"; font-weight: 800;
+      cursor: pointer; transition: all 0.2s; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-
-    .modal-actions { display: flex; gap: 12px; margin-top: 25px; }
-    .btn-submit { flex: 2; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-family: "Cairo"; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem; }
-    .btn-submit:hover:not(:disabled) { background: var(--primary-dark); }
-    .btn-submit:disabled { background: #cbd5e1; cursor: not-allowed; }
-    .btn-cancel { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 12px; cursor: pointer; font-family: "Cairo"; font-weight: 600; }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-primary:disabled { background: #d1d5db; cursor: not-allowed; }
+    .btn-primary.purple { background: #7c3aed; }
+    .btn-primary.purple:hover:not(:disabled) { background: #6d28d9; }
+    .btn-cancel {
+      flex: 1; background: transparent; border: 1.5px solid var(--border);
+      color: var(--text-muted); border-radius: 12px; cursor: pointer;
+      font-family: "Cairo"; font-weight: 700; transition: background 0.15s;
+      padding: 14px;
+    }
     .btn-cancel:hover { background: #f9fafb; }
 
-    /* TOAST NOTIFICATION */
-    #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+    /* ===== QUESTIONS MODAL ===== */
+    .q-modal-card {
+      background: white;
+      border-radius: 24px;
+      width: 94%;
+      max-width: 700px;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    .q-tabs {
+      display: flex;
+      gap: 0;
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 20px;
+    }
+    .q-tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      font-family: "Cairo";
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: all 0.2s;
+      color: var(--text-muted);
+    }
+    .q-tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+    /* Manual entry */
+    .question-block {
+      background: #fafbff;
+      border: 1.5px solid #c7d2fe;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .question-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .question-num { font-weight: 900; color: var(--primary); font-size: 0.95rem; }
+    .btn-remove-q {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: none;
+      padding: 5px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-family: "Cairo";
+      font-weight: 700;
+      font-size: 0.82rem;
+      transition: all 0.15s;
+    }
+    .btn-remove-q:hover { background: #fecaca; }
+
+    .field-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+    .required-star { color: var(--danger); }
+    .field-input, .field-textarea, .field-select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      font-family: "Cairo";
+      font-size: 0.92rem;
+      color: var(--text-main);
+      background: white;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: vertical;
+    }
+    .field-input:focus, .field-textarea:focus, .field-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+    .field-textarea { min-height: 70px; }
+
+    .choices-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .choice-wrap { display: flex; align-items: center; gap: 8px; }
+    .choice-input {
+      flex: 1;
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: "Cairo";
+      font-size: 0.88rem;
+      transition: border-color 0.2s;
+    }
+    .choice-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
+    .choice-correct-btn {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: white;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .choice-correct-btn.selected {
+      border-color: var(--success);
+      background: var(--success-bg);
+    }
+    .choice-label {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      width: 20px;
+    }
+
+    .btn-add-question {
+      width: 100%;
+      padding: 13px;
+      border: 2px dashed #c7d2fe;
+      border-radius: 12px;
+      background: #eff6ff;
+      color: var(--primary);
+      font-family: "Cairo";
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-bottom: 20px;
+    }
+    .btn-add-question:hover { background: #dbeafe; border-color: var(--primary); }
+
+    /* Paste area */
+    .paste-area {
+      width: 100%;
+      min-height: 200px;
+      padding: 14px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-family: "Cairo";
+      font-size: 0.92rem;
+      resize: vertical;
+      transition: border-color 0.2s;
+      line-height: 1.8;
+    }
+    .paste-area:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .paste-hint {
+      background: var(--warning-bg);
+      border: 1px solid #fde68a;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      font-size: 0.85rem;
+      color: #92400e;
+      line-height: 1.7;
+    }
+    .paste-hint b { color: #78350f; }
+
+    /* ===== STATUS INDICATORS ===== */
+    .upload-status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+    .status-uploading { background: #fef9c3; color: #a16207; }
+    .status-done { background: var(--success-bg); color: var(--success); }
+    .status-failed { background: var(--danger-bg); color: var(--danger); }
+
+    /* ===== TOAST ===== */
+    #toast-container {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+      z-index: 2000; display: flex; flex-direction: column; gap: 10px; align-items: center;
+      pointer-events: none; min-width: 260px;
+    }
     .toast {
-      background: #333; color: white; padding: 12px 24px; border-radius: 50px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-size: 0.9rem; font-weight: 600;
-      display: flex; align-items: center; gap: 10px; animation: slideUp 0.3s ease forwards;
+      background: #1f2937; color: white; padding: 13px 24px; border-radius: 50px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18); font-size: 0.92rem; font-weight: 700;
+      display: flex; align-items: center; gap: 10px;
+      animation: slideUp 0.3s ease forwards;
+      pointer-events: auto;
     }
     .toast.success { background: var(--success); }
     .toast.error { background: var(--danger); }
+    .toast.info { background: var(--primary); }
+    .toast.warning { background: var(--warning); }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-    /* SPINNER */
-    .spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin: auto; }
-    .page-loader { width: 40px; height: 40px; border-color: var(--secondary); border-top-color: var(--primary); }
+    /* ===== SPINNER ===== */
+    .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* DEBUG */
-    #debug-console { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 200px; background: #111; color: #0f0; font-family: monospace; padding: 10px; overflow-y: auto; z-index: 9999; font-size: 12px; direction: ltr; text-align: left; opacity: 0.95; }
-    .log-line { border-bottom: 1px solid #333; padding: 2px 0; }
-    .log-line.error { color: #ff5555; }
+    /* ===== EMPTY STATE ===== */
+    .empty-state { padding: 60px 20px; text-align: center; color: var(--text-muted); }
+    .empty-icon { font-size: 42px; margin-bottom: 12px; }
+    .empty-title { font-weight: 800; font-size: 1.05rem; color: #374151; margin-bottom: 4px; }
+    .empty-sub { font-size: 0.88rem; }
+
+    /* ===== DEBUG ===== */
+    #debug-console { display: none; position: fixed; bottom: 0; left: 0; width: 100%; height: 180px; background: #0f172a; color: #4ade80; font-family: monospace; padding: 10px; overflow-y: auto; z-index: 9999; font-size: 12px; direction: ltr; text-align: left; }
+    .log-line { padding: 2px 0; border-bottom: 1px solid #1e293b; }
+    .log-line.error { color: #f87171; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.5rem; }
+      .tab-btn { padding: 9px 14px; font-size: 0.85rem; }
+      .choices-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
   <header id="main-header">
+    <div style="font-size:36px; margin-bottom:8px;">📚</div>
     <h1>نظام متابعة الأسئلة</h1>
-    <p>إدارة ومزامنة ملفات المحاضرات</p>
+    <p>ارفع الملفات أو أدخل الأسئلة لكل محاضرة بسهولة</p>
+    <div class="header-badge">
+      <span>🔴</span> فقط الدروس غير المكتملة تظهر هنا
+    </div>
   </header>
 
-  <div class="tabs-wrapper">
-    <button class="tab-btn active" onclick="switchTab('chemistry')">الكيمياء</button>
-    <button class="tab-btn" onclick="switchTab('biology')">الأحياء</button>
-    <button class="tab-btn" onclick="switchTab('math')">الرياضيات</button>
-    <button class="tab-btn" onclick="switchTab('arabic')">اللغة العربية</button>
-    <button class="tab-btn" onclick="switchTab('physics')">الفيزياء</button>
-    <button class="tab-btn" onclick="switchTab('english')">English</button>
+  <div class="help-banner">
+    <div class="help-icon">💡</div>
+    <div class="help-text">
+      <h3>كيف أستخدم النظام؟</h3>
+      <p>
+        ابحث عن درسك من القائمة أدناه ← اضغط <b style="color:#7c3aed">أسئلة</b> لكتابة الأسئلة أو <b style="color:#2563eb">رفع ملف</b> لرفع ملف ← اضغط إرسال. خلاص! ✅
+      </p>
+    </div>
+  </div>
+
+  <div class="tabs-wrapper" id="tabsWrapper">
+    <button class="tab-btn active" onclick="switchTab('chemistry', this)">🧪 الكيمياء</button>
+    <button class="tab-btn" onclick="switchTab('biology', this)">🔬 الأحياء</button>
+    <button class="tab-btn" onclick="switchTab('math', this)">📐 الرياضيات</button>
+    <button class="tab-btn" onclick="switchTab('arabic', this)">📖 العربية</button>
+    <button class="tab-btn" onclick="switchTab('physics', this)">⚡ الفيزياء</button>
+    <button class="tab-btn" onclick="switchTab('english', this)">🌐 English</button>
   </div>
 
   <div id="content-area">
-      <div style="text-align:center; padding: 80px 20px;">
-          <div class="spinner page-loader"></div>
-          <p style="margin-top:15px; color:var(--text-muted); font-weight:600;">جاري جلب البيانات من السيرفر...</p>
-      </div>
+    <div style="text-align:center; padding: 80px 20px;">
+      <div style="font-size:48px; margin-bottom:16px; animation: spin 1s linear infinite; display:inline-block;">⏳</div>
+      <p style="color:var(--text-muted); font-weight:700; font-size:1.05rem;">جاري تحميل البيانات...</p>
+      <p style="color:var(--text-light); font-size:0.88rem; margin-top:6px;">انتظر لحظة من فضلك</p>
+    </div>
   </div>
 </div>
 
+<!-- ========== UPLOAD MODAL ========== -->
 <div class="modal-overlay" id="uploadModal">
   <div class="modal-card">
-    <div class="modal-title">رفع الملفات</div>
-    <div id="modalSubtitle" class="modal-subtitle"></div>
-    
-    <div class="file-drop-area" onclick="document.getElementById('fileInput').click()">
-      <div style="font-size:32px; margin-bottom:10px;">☁️</div>
-      <div style="font-weight:700; color:var(--primary)">اضغط لاختيار الملفات</div>
-      <div style="font-size:12px; color:#94a3b8; margin-top:5px;">يدعم الصور و PDF</div>
+    <div class="modal-header">
+      <div style="font-size:28px; margin-bottom:6px;">📎</div>
+      <div class="modal-title">رفع ملف للمحاضرة</div>
+      <div class="modal-subtitle" id="uploadModalSubtitle">يرجى اختيار الملفات التي تريد رفعها</div>
     </div>
-    <input type="file" id="fileInput" hidden multiple onchange="handleFileSelect(this)">
-    
-    <div class="file-list" id="fileList"></div>
-    
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
-      <button class="btn-submit" id="submitBtn" onclick="submitUpload()">رفع الآن</button>
+    <div class="modal-body">
+      <div class="upload-step">
+        <div class="upload-step-label">
+          <div class="step-num">1</div>
+          اضغط على المربع أدناه لاختيار الملف من جهازك
+        </div>
+        <div class="file-drop-area" onclick="document.getElementById('fileInput').click()">
+          <div class="file-drop-icon">📁</div>
+          <div class="file-drop-label">اضغط هنا لاختيار الملف</div>
+          <div class="file-drop-sub">يدعم الصور (JPG, PNG) وملفات PDF</div>
+        </div>
+        <input type="file" id="fileInput" hidden multiple onchange="handleFileSelect(this)">
+        <div class="file-list" id="fileList"></div>
+      </div>
+
+      <div class="upload-step" style="background:#fffbeb; border-color:#fde68a;">
+        <div class="upload-step-label" style="color:#92400e;">
+          <div class="step-num" style="background:#f59e0b;">2</div>
+          بعد اختيار الملف، اضغط زر <b>"رفع الآن"</b> في الأسفل
+        </div>
+        <p style="font-size:0.85rem; color:#92400e; margin:0;">
+          ⚠️ بعد الضغط يمكنك إغلاق النافذة — الرفع سيكتمل تلقائياً في الخلفية
+        </p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('uploadModal')">إلغاء</button>
+      <button class="btn-primary" id="uploadSubmitBtn" onclick="submitUpload()">
+        <span>☁️</span> رفع الآن
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== QUESTIONS MODAL ========== -->
+<div class="modal-overlay" id="questionsModal">
+  <div class="q-modal-card">
+    <div class="modal-header" style="position:sticky; top:0; background:white; z-index:10; border-radius:24px 24px 0 0;">
+      <div style="font-size:28px; margin-bottom:6px;">✏️</div>
+      <div class="modal-title">إضافة أسئلة للمحاضرة</div>
+      <div class="modal-subtitle" id="questionsModalSubtitle">أدخل أسئلة الامتحان لهذه المحاضرة</div>
+    </div>
+    <div class="modal-body">
+      <div class="q-tabs">
+        <button class="q-tab-btn active" onclick="switchQTab('manual', this)">✍️ إدخال يدوي سؤال بسؤال</button>
+        <button class="q-tab-btn" onclick="switchQTab('paste', this)">📋 لصق نص جاهز</button>
+      </div>
+
+      <!-- MANUAL TAB -->
+      <div id="q-manual">
+        <div id="questionsContainer"></div>
+        <button class="btn-add-question" onclick="addQuestion()">
+          <span style="font-size:20px;">＋</span>
+          إضافة سؤال جديد
+        </button>
+      </div>
+
+      <!-- PASTE TAB -->
+      <div id="q-paste" style="display:none;">
+        <div class="paste-hint">
+          <b>📌 تعليمات اللصق:</b><br>
+          الصق نص الأسئلة كما هو من أي مصدر (Word، PDF، واتساب...). النظام سيرسله لك كما هو بدون تعديل.
+          <br><br>
+          <b>مثال للتنسيق المقترح:</b><br>
+          <span style="font-family:monospace; font-size:0.82rem;">
+          ١- ما هو الرمز الكيميائي للماء؟<br>
+          أ- H2O ✓<br>
+          ب- CO2<br>
+          ج- NaCl<br>
+          </span>
+        </div>
+        <label class="field-label">الصق نص الأسئلة هنا <span class="required-star">*</span></label>
+        <textarea class="paste-area" id="pasteText" placeholder="الصق أسئلتك هنا..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer" style="position:sticky; bottom:0; background:white; border-radius:0 0 24px 24px;">
+      <button class="btn-cancel" onclick="closeModal('questionsModal')">إلغاء</button>
+      <button class="btn-primary purple" id="questionsSubmitBtn" onclick="submitQuestions()">
+        <span>📤</span> إرسال الأسئلة
+      </button>
     </div>
   </div>
 </div>
 
 <div id="toast-container"></div>
-
-<div id="debug-console">
-  <div>> SYSTEM READY. TRIPLE CLICK TITLE TO TOGGLE.</div>
-</div>
+<div id="debug-console"><div class="log-line">> SYSTEM READY</div></div>
 
 <script>
-  // =========================================================================
-  // CONFIGURATION
-  // =========================================================================
-  const API_URL = "https://script.google.com/macros/s/AKfycbx0_Hmdm2gucB87juLA_Rmzt1x8iL-ewnu3MsSf0SnEZQxqmN0e0I_1aktk_vw4j9kN/exec";
+// =========================================================================
+// CONFIG
+// =========================================================================
+const API_URL = "https://script.google.com/macros/s/AKfycbx0_Hmdm2gucB87juLA_Rmzt1x8iL-ewnu3MsSf0SnEZQxqmN0e0I_1aktk_vw4j9kN/exec";
+
+let currentUpload = { id: null, subject: null, files: [] };
+let currentQuestion = { id: null, subject: null, lecture: null };
+let activeQTab = 'manual';
+let questionCount = 0;
+
+// =========================================================================
+// INIT
+// =========================================================================
+document.addEventListener('DOMContentLoaded', fetchData);
+
+// Debug toggle
+let clickCount = 0;
+document.getElementById('main-header').addEventListener('click', () => {
+  clickCount++;
+  if (clickCount === 3) {
+    const dc = document.getElementById('debug-console');
+    dc.style.display = dc.style.display === 'block' ? 'none' : 'block';
+    clickCount = 0;
+  }
+  setTimeout(() => clickCount = 0, 1000);
+});
+
+function log(msg, type = '') {
+  const dc = document.getElementById('debug-console');
+  const line = document.createElement('div');
+  line.className = `log-line ${type}`;
+  line.innerText = `> ${msg}`;
+  dc.appendChild(line);
+  dc.scrollTop = dc.scrollHeight;
+}
+
+function showToast(msg, type = 'success', duration = 3500) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+  toast.innerHTML = `<span>${icons[type] || '💬'}</span> ${msg}`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.transition = 'all 0.3s ease';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(20px)';
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+}
+
+// =========================================================================
+// DATA FETCH
+// =========================================================================
+async function fetchData() {
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    renderAll(data);
+  } catch(e) {
+    log('FETCH ERROR: ' + e, 'error');
+    document.getElementById('content-area').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🔌</div>
+        <div class="empty-title">حدث خطأ في الاتصال</div>
+        <div class="empty-sub" style="margin-bottom:16px;">تحقق من الإنترنت وحاول مرة أخرى</div>
+        <button onclick="location.reload()" class="btn-upload" style="margin:auto; display:flex; width:fit-content;">
+          🔄 إعادة المحاولة
+        </button>
+      </div>`;
+  }
+}
+
+// =========================================================================
+// RENDER
+// =========================================================================
+function renderAll(data) {
+  const container = document.getElementById('content-area');
+  container.innerHTML = '';
   
-  let currentUpload = { id: null, subject: null, files: [] };
-
-  // Initialize
-  document.addEventListener('DOMContentLoaded', () => {
-    fetchData();
-  });
-
-  // --- TRIPLE CLICK SECRET ---
-  let clickCount = 0;
-  const titleHeader = document.getElementById('main-header');
-  const debugConsole = document.getElementById('debug-console');
-
-  titleHeader.addEventListener('click', () => {
-    clickCount++;
-    if (clickCount === 3) {
-      debugConsole.style.display = (debugConsole.style.display === 'block') ? 'none' : 'block';
-      logToConsole("DEBUG MODE TOGGLED");
-      clickCount = 0;
-    }
-    setTimeout(() => clickCount = 0, 1000);
-  });
-
-  function logToConsole(msg, type = 'normal') {
-    const line = document.createElement('div');
-    line.className = `log-line ${type}`;
-    line.innerText = `> ${msg}`;
-    debugConsole.appendChild(line);
-    debugConsole.scrollTop = debugConsole.scrollHeight; 
-  }
-
-  function showToast(msg, type = 'success') {
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    const icon = type === 'success' ? '✅' : '⚠️';
-    toast.innerHTML = `<span>${icon}</span> ${msg}`;
-    container.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(20px)';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-  }
-
-  // --- MAIN LOGIC ---
-
-  async function fetchData() {
-    try {
-      const res = await fetch(API_URL);
-      const data = await res.json();
-      renderAll(data);
-    } catch(e) {
-      console.error(e);
-      document.getElementById('content-area').innerHTML = `
-        <div style="text-align:center; color:var(--danger); padding:40px;">
-           <div style="font-size:40px; margin-bottom:10px;">🔌</div>
-           <b>حدث خطأ في الاتصال</b><br>
-           <button onclick="location.reload()" class="upload-btn" style="margin-top:15px;">إعادة المحاولة</button>
-        </div>`;
-    }
-  }
-
-  function renderAll(data) {
-    const container = document.getElementById('content-area');
-    container.innerHTML = '';
-    const subjectMap = { 
-      'chemistry': 'الكيمياء', 'biology': 'الأحياء', 'math': 'الرياضيات', 
-      'arabic': 'اللغة العربية', 'physics': 'الفيزياء', 'english': 'اللغة الإنجليزية' 
-    };
+  const subjects = {
+    'chemistry': 'الكيمياء',
+    'biology': 'الأحياء',
+    'math': 'الرياضيات',
+    'arabic': 'اللغة العربية',
+    'physics': 'الفيزياء',
+    'english': 'English'
+  };
+  
+  Object.entries(subjects).forEach(([key, name], index) => {
+    const isActive = index === 0 ? 'active-content' : '';
+    const subjData = data[key];
+    const totalCount = subjData ? Object.values(subjData).reduce((acc, arr) => acc + arr.length, 0) : 0;
     
-    Object.keys(subjectMap).forEach((subj, index) => {
-      const subjectName = subjectMap[subj];
-      const isActive = (index === 0) ? 'active-content' : '';
-      const cardDiv = document.createElement('div');
-      cardDiv.id = subj;
-      cardDiv.className = `subject-content ${isActive}`;
-      
-      let cardHTML = `
-        <div class="subject-card">
-          <div class="card-header">${subjectName}</div>
-          <div class="search-bar">
-            <input
-              type="text"
-              class="search-input"
-              placeholder="ابحث داخل ${subjectName}..."
-              oninput="filterLectures('${subj}', this.value)"
-            />
-          </div>`;
-      const subjectData = data[subj];
+    const div = document.createElement('div');
+    div.id = key;
+    div.className = `subject-content ${isActive}`;
+    
+    let html = `<div class="subject-card">
+      <div class="card-header">
+        <span>${name}</span>
+        ${totalCount > 0 ? `<span class="card-count">${totalCount} محاضرة متبقية</span>` : ''}
+      </div>
+      <div class="search-bar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" placeholder="ابحث عن محاضرة..." oninput="filterLectures('${key}', this.value)">
+        </div>
+      </div>`;
 
-      if (!subjectData || Object.keys(subjectData).length === 0) {
-        cardHTML += `
-          <div style="padding:60px; text-align:center; color:var(--text-muted);">
-            <div style="font-size:40px; margin-bottom:10px;">🎉</div>
-            <div style="font-weight:600;">رائع! تم رفع جميع محاضرات ${subjectName}</div>
-          </div>`;
-      } else {
-        for (const [grade, lectures] of Object.entries(subjectData)) {
-          let rowsHTML = '';
-          lectures.forEach(l => {
-            rowsHTML += `
-              <tr id="row-${l.id}">
-                <td width="25%"><span class="chapter-badge">${l.chapter}</span></td>
-                <td><b>${l.lecture}</b></td>
-                <td style="text-align:center; width:120px;">
-                  <button class="upload-btn" onclick="openUploadModal('${l.id}', '${subj}', '${l.lecture}')">
-                    رفع
-                  </button>
-                </td>
-              </tr>`;
-          });
-          cardHTML += `
-            <details open>
-              <summary>${grade}</summary>
-              <div class="table-wrapper">
-                <table>
-                  <thead><tr><th>الفصل</th><th>المحاضرة</th><th style="text-align:center">إجراء</th></tr></thead>
-                  <tbody>${rowsHTML}</tbody>
-                </table>
+    if (!subjData || Object.keys(subjData).length === 0) {
+      html += `<div class="empty-state">
+        <div class="empty-icon">🎉</div>
+        <div class="empty-title">رائع! تم إنجاز كل محاضرات ${name}</div>
+        <div class="empty-sub">لا توجد محاضرات متبقية في هذه المادة</div>
+      </div>`;
+    } else {
+      let rowNum = 0;
+      for (const [grade, lectures] of Object.entries(subjData)) {
+        let rows = '';
+        lectures.forEach(l => {
+          rowNum++;
+          rows += `<tr id="row-${l.id}">
+            <td class="row-num">${rowNum}</td>
+            <td><span class="chapter-badge">${l.chapter}</span></td>
+            <td><b>${l.lecture}</b></td>
+            <td>
+              <div class="action-cell">
+                <button class="btn-upload" onclick="openUploadModal('${l.id}', '${key}', \`${l.lecture.replace(/`/g,'')}\`)">
+                  📎 رفع ملف
+                </button>
+                <button class="btn-questions" onclick="openQuestionsModal('${l.id}', '${key}', \`${l.lecture.replace(/`/g,'')}\`)">
+                  ✏️ أسئلة
+                </button>
               </div>
-            </details>`;
-        }
+            </td>
+          </tr>`;
+        });
+        html += `<details open>
+          <summary>
+            <span>${grade}</span>
+            <span class="grade-badge">${lectures.length} درس</span>
+          </summary>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th width="40">#</th>
+                  <th width="130">الفصل</th>
+                  <th>اسم المحاضرة</th>
+                  <th style="text-align:center; width:200px">الإجراء</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </details>`;
       }
-      cardHTML += `</div></div>`;
-      cardDiv.innerHTML = cardHTML;
-      container.appendChild(cardDiv);
-    });
+    }
+    
+    html += `</div></div>`;
+    div.innerHTML = html;
+    container.appendChild(div);
+  });
+}
+
+// =========================================================================
+// TAB SWITCHING
+// =========================================================================
+function switchTab(id, btn) {
+  document.querySelectorAll('.subject-content').forEach(c => c.classList.remove('active-content'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active-content');
+  if (btn) btn.classList.add('active');
+}
+
+function filterLectures(subject, query) {
+  const container = document.getElementById(subject);
+  if (!container) return;
+  const q = query.toLowerCase().trim();
+  container.querySelectorAll('tbody tr').forEach(row => {
+    row.style.display = !q || row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// =========================================================================
+// UPLOAD MODAL
+// =========================================================================
+function openUploadModal(id, subject, title) {
+  currentUpload = { id, subject, files: [] };
+  document.getElementById('uploadModalSubtitle').textContent = `المحاضرة: ${title}`;
+  document.getElementById('fileList').innerHTML = '';
+  document.getElementById('fileInput').value = '';
+  document.getElementById('uploadSubmitBtn').innerHTML = '<span>☁️</span> رفع الآن';
+  document.getElementById('uploadSubmitBtn').disabled = false;
+  document.getElementById('uploadModal').classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function handleFileSelect(input) {
+  const list = document.getElementById('fileList');
+  list.innerHTML = '';
+  currentUpload.files = [];
+  
+  Array.from(input.files).forEach(file => {
+    const reader = new FileReader();
+    const fileId = Date.now().toString() + Math.random().toString(16).slice(2);
+    
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      const base64 = dataUrl.split(',')[1];
+      currentUpload.files.push({ id: fileId, name: file.name, mimeType: file.type, data: base64 });
+      
+      const item = document.createElement('div');
+      item.className = 'file-item';
+      item.dataset.fileId = fileId;
+      const isImage = file.type?.startsWith('image/');
+      item.innerHTML = `
+        ${isImage ? `<img src="${dataUrl}" alt="${file.name}" class="file-thumb">` : `<span class="file-icon">📄</span>`}
+        <span class="file-name">${file.name}</span>
+        <button type="button" class="file-remove-btn" onclick="removeFile('${fileId}', this)">🗑️ حذف</button>`;
+      list.appendChild(item);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removeFile(fileId, btn) {
+  currentUpload.files = currentUpload.files.filter(f => f.id !== fileId);
+  btn.closest('.file-item')?.remove();
+}
+
+function submitUpload() {
+  const btn = document.getElementById('uploadSubmitBtn');
+  if (currentUpload.files.length === 0) {
+    showToast('يرجى اختيار ملف واحد على الأقل', 'error');
+    return;
   }
 
-  // --- UPLOAD HANDLERS ---
+  // INSTANT UI FEEDBACK - mark as uploaded immediately
+  btn.innerHTML = '<div class="spinner"></div> جاري الرفع...';
+  btn.disabled = true;
 
-  window.openUploadModal = function(id, subject, title) {
-    currentUpload = { id: id, subject: subject, files: [] };
-    document.getElementById('modalSubtitle').innerText = `جاري الرفع لـ: ${title}`;
-    document.getElementById('fileList').innerHTML = '';
-    document.getElementById('fileInput').value = ''; 
-    document.getElementById('uploadModal').classList.add('open');
-  };
+  const rowId = currentUpload.id;
+  const uploadData = { ...currentUpload };
 
-  window.closeModal = function() {
-    document.getElementById('uploadModal').classList.remove('open');
-  };
+  // Close modal immediately
+  closeModal('uploadModal');
+  showToast('⏳ جاري الرفع في الخلفية... يمكنك المتابعة', 'info', 5000);
 
-  window.handleFileSelect = function(input) {
-    const list = document.getElementById('fileList');
-    list.innerHTML = '';
-    currentUpload.files = [];
+  // Mark row as "uploading" visually
+  markRowStatus(rowId, 'uploading');
+
+  // Do the upload in background - user doesn't wait
+  fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify({ ...uploadData, type: 'file' })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.logs) data.logs.forEach(l => log(l));
+    if (data.status === 'error') {
+      markRowStatus(rowId, 'failed', data.message);
+      showToast('فشل الرفع: ' + data.message, 'error', 6000);
+      log('UPLOAD ERROR: ' + data.message, 'error');
+    } else {
+      showToast('✅ تم رفع الملف بنجاح!', 'success');
+      log('Upload success for ' + rowId);
+      removeRow(rowId);
+    }
+  })
+  .catch(err => {
+    log('UPLOAD FETCH ERROR: ' + err, 'error');
+    markRowStatus(rowId, 'failed', 'فشل الاتصال');
+    showToast('فشل الاتصال بالسيرفر', 'error');
+  });
+}
+
+function markRowStatus(rowId, status, msg) {
+  const row = document.getElementById(`row-${rowId}`);
+  if (!row) return;
+  const cell = row.querySelector('.action-cell');
+  if (!cell) return;
+  
+  if (status === 'uploading') {
+    const indicator = `<span class="upload-status-indicator status-uploading">⏳ جاري الرفع</span>`;
+    cell.insertAdjacentHTML('beforeend', indicator);
+  } else if (status === 'done') {
+    cell.innerHTML = `<span class="upload-status-indicator status-done">✅ تم</span>`;
+  } else if (status === 'failed') {
+    const indicator = `<span class="upload-status-indicator status-failed">❌ فشل</span>`;
+    cell.insertAdjacentHTML('beforeend', indicator);
+  }
+}
+
+function removeRow(rowId) {
+  const row = document.getElementById(`row-${rowId}`);
+  if (!row) return;
+  row.style.transition = 'all 0.4s ease';
+  row.style.opacity = '0';
+  row.style.transform = 'translateX(-20px)';
+  setTimeout(() => {
+    const tbody = row.parentElement;
+    row.remove();
+    if (tbody && tbody.children.length === 0) {
+      const details = tbody.closest('details');
+      if (details) {
+        details.style.transition = 'opacity 0.3s';
+        details.style.opacity = '0';
+        setTimeout(() => {
+          const card = details.parentElement;
+          details.remove();
+          if (card && card.querySelectorAll('details').length === 0) {
+            card.innerHTML = `<div class="empty-state">
+              <div class="empty-icon">🎉</div>
+              <div class="empty-title">انتهيت من هذا القسم!</div>
+            </div>`;
+          }
+        }, 300);
+      }
+    }
+  }, 400);
+}
+
+// =========================================================================
+// QUESTIONS MODAL
+// =========================================================================
+function openQuestionsModal(id, subject, lecture) {
+  currentQuestion = { id, subject, lecture };
+  document.getElementById('questionsModalSubtitle').textContent = `المحاضرة: ${lecture}`;
+  document.getElementById('questionsContainer').innerHTML = '';
+  document.getElementById('pasteText').value = '';
+  questionCount = 0;
+  
+  // Add first question by default
+  addQuestion();
+  
+  // Reset to manual tab
+  switchQTab('manual', document.querySelector('.q-tab-btn'));
+  document.getElementById('questionsSubmitBtn').innerHTML = '<span>📤</span> إرسال الأسئلة';
+  document.getElementById('questionsSubmitBtn').disabled = false;
+  document.getElementById('questionsModal').classList.add('open');
+}
+
+function switchQTab(tab, btn) {
+  activeQTab = tab;
+  document.getElementById('q-manual').style.display = tab === 'manual' ? 'block' : 'none';
+  document.getElementById('q-paste').style.display = tab === 'paste' ? 'block' : 'none';
+  document.querySelectorAll('.q-tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function addQuestion() {
+  questionCount++;
+  const num = questionCount;
+  const container = document.getElementById('questionsContainer');
+  const block = document.createElement('div');
+  block.className = 'question-block';
+  block.dataset.qnum = num;
+  block.innerHTML = `
+    <div class="question-block-header">
+      <span class="question-num">سؤال ${num}</span>
+      <button type="button" class="btn-remove-q" onclick="removeQuestion(this)">✕ حذف</button>
+    </div>
     
-    Array.from(input.files).forEach(file => {
-      const reader = new FileReader();
-      const fileId = Date.now().toString() + Math.random().toString(16).slice(2);
-
-      reader.onload = function(e) {
-        const dataUrl = e.target.result;
-        const base64 = dataUrl.split(',')[1];
-
-        currentUpload.files.push({
-          id: fileId,
-          name: file.name,
-          mimeType: file.type,
-          data: base64
-        });
-
-        const item = document.createElement('div');
-        item.className = 'file-item';
-        item.dataset.fileId = fileId;
-
-        const isImage = file.type && file.type.startsWith('image/');
-        const preview = isImage
-          ? `<img src="${dataUrl}" alt="${file.name}" class="file-thumb">`
-          : `<span class="file-icon">📄</span>`;
-
-        item.innerHTML = `
-          ${preview}
-          <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-            <b>${file.name}</b>
+    <div style="margin-bottom:14px;">
+      <label class="field-label">نص السؤال <span class="required-star">*</span></label>
+      <textarea class="field-textarea q-text" placeholder="اكتب نص السؤال هنا..." required></textarea>
+    </div>
+    
+    <div style="margin-bottom:14px;">
+      <label class="field-label">الخيارات <span class="required-star">*</span> <small style="color:var(--text-muted); font-weight:500;">(اضغط ✓ على الخيار الصحيح)</small></label>
+      <div class="choices-grid">
+        ${['أ', 'ب', 'ج', 'د'].map((letter, i) => `
+          <div class="choice-wrap">
+            <span class="choice-label">${letter}-</span>
+            <input type="text" class="choice-input choice-${i}" placeholder="الخيار ${letter}" />
+            <button type="button" class="choice-correct-btn" onclick="setCorrectChoice(this, ${i})" title="اضغط إذا هذا هو الجواب الصحيح">✓</button>
           </div>
-          <button
-            type="button"
-            class="file-remove-btn"
-            onclick="removeSelectedFile('${fileId}', this)"
-          >
-            حذف
-          </button>
-        `;
-
-        list.appendChild(item);
-      };
-
-      reader.readAsDataURL(file);
-    });
-  };
-
-  window.removeSelectedFile = function(fileId, btnEl) {
-    currentUpload.files = currentUpload.files.filter(f => f.id !== fileId);
-    const item = btnEl.closest('.file-item');
-    if (item) {
-      item.remove();
-    }
-  };
-
-  window.submitUpload = function() {
-    const btn = document.getElementById('submitBtn');
-    if(currentUpload.files.length === 0) { 
-        showToast("يرجى اختيار ملف واحد على الأقل", "error");
-        return; 
-    }
-
-    btn.innerHTML = '<div class="spinner"></div>';
-    btn.disabled = true;
-    logToConsole("Starting Upload...", "normal");
-
-    fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify(currentUpload)
-    })
-    .then(response => response.json())
-    .then(data => {
-       // --- PRINT SERVER LOGS ---
-       if (data.logs && data.logs.length > 0) {
-         data.logs.forEach(log => logToConsole(log));
-       }
-
-       if (data.status === "error") {
-         showToast(data.message, "error");
-         logToConsole("ERROR: " + data.message, "error");
-         btn.innerHTML = 'رفع الآن';
-         btn.disabled = false;
-         return;
-       }
-
-       showToast("تم الرفع بنجاح!", "success");
-       logToConsole("Upload Success!", "success");
-       closeModal();
-       btn.innerHTML = 'رفع الآن';
-       btn.disabled = false;
-       
-       // Smooth Remove Animation
-       const row = document.getElementById(`row-${currentUpload.id}`);
-       if(row) {
-         row.style.transition = 'all 0.5s ease';
-         row.style.transform = 'translateX(-20px)';
-         row.style.opacity = '0';
-         setTimeout(() => {
-           const tbody = row.parentElement;
-           row.remove();
-           // Check if group is empty
-           if (tbody.children.length === 0) {
-              const details = tbody.closest('details'); 
-              const card = details.parentElement;  
-              details.style.opacity = '0';
-              setTimeout(() => {
-                  details.remove();
-                  if (card.querySelectorAll('details').length === 0) {
-                      card.innerHTML = `
-                      <div style="padding:60px; text-align:center; color:var(--text-muted);">
-                        <div style="font-size:40px; margin-bottom:10px;">🎉</div>
-                        <div style="font-weight:600;">تم الانتهاء من هذا القسم!</div>
-                      </div>`;
-                  }
-              }, 300);
-           }
-         }, 500);
-       }
-    })
-    .catch(err => {
-      console.error(err);
-      logToConsole("FETCH ERROR: " + err.toString(), "error");
-      showToast("فشل الاتصال بالسيرفر", "error");
-      btn.innerHTML = 'رفع الآن';
-      btn.disabled = false;
-    });
-  };
-
-  window.switchTab = function(id) {
-    document.querySelectorAll('.subject-content').forEach(c => {
-        c.classList.remove('active-content');
-        c.style.animation = 'none';
-        c.offsetHeight; /* trigger reflow */
-        c.style.animation = null; 
-    });
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        `).join('')}
+      </div>
+      <input type="hidden" class="correct-answer" value="">
+    </div>
     
-    document.getElementById(id).classList.add('active-content');
-    if(event && event.target) event.target.classList.add('active');
-  };
+    <div>
+      <label class="field-label">الشرح <small style="color:var(--text-muted); font-weight:500;">(اختياري)</small></label>
+      <textarea class="field-textarea q-explain" placeholder="اكتب شرح الإجابة الصحيحة (اختياري)..." style="min-height:55px;"></textarea>
+    </div>
+  `;
+  container.appendChild(block);
+  block.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
 
-  // --- SEARCH / FILTER ---
+function removeQuestion(btn) {
+  const block = btn.closest('.question-block');
+  if (document.querySelectorAll('.question-block').length <= 1) {
+    showToast('يجب أن يكون هناك سؤال واحد على الأقل', 'warning');
+    return;
+  }
+  block.style.transition = 'all 0.3s';
+  block.style.opacity = '0';
+  block.style.transform = 'scale(0.95)';
+  setTimeout(() => { block.remove(); renumberQuestions(); }, 300);
+}
 
-  window.filterLectures = function(subject, query) {
-    const container = document.getElementById(subject);
-    if (!container) return;
+function renumberQuestions() {
+  document.querySelectorAll('.question-block').forEach((block, i) => {
+    block.querySelector('.question-num').textContent = `سؤال ${i + 1}`;
+  });
+}
 
-    const rows = container.querySelectorAll('tbody tr');
-    const q = (query || '').toLowerCase().trim();
+function setCorrectChoice(btn, index) {
+  const block = btn.closest('.question-block');
+  // Clear all
+  block.querySelectorAll('.choice-correct-btn').forEach(b => b.classList.remove('selected'));
+  // Select this
+  btn.classList.add('selected');
+  // Store value
+  const choiceInput = block.querySelector(`.choice-${index}`);
+  block.querySelector('.correct-answer').value = choiceInput.value || String.fromCharCode(0x0623 + index * 2); // fallback to letter
+  
+  // Update when input changes
+  choiceInput.addEventListener('input', () => {
+    if (btn.classList.contains('selected')) {
+      block.querySelector('.correct-answer').value = choiceInput.value;
+    }
+  });
+}
 
-    rows.forEach(row => {
-      const text = row.textContent.toLowerCase();
-      row.style.display = !q || text.includes(q) ? '' : 'none';
+function collectQuestions() {
+  const blocks = document.querySelectorAll('.question-block');
+  const questions = [];
+  let valid = true;
+
+  blocks.forEach((block, i) => {
+    const text = block.querySelector('.q-text').value.trim();
+    const choices = Array.from(block.querySelectorAll('.choice-input')).map(inp => inp.value.trim());
+    const correctBtn = block.querySelector('.choice-correct-btn.selected');
+    const correctIndex = correctBtn ? Array.from(block.querySelectorAll('.choice-correct-btn')).indexOf(correctBtn) : -1;
+    const correctText = correctIndex !== -1 ? choices[correctIndex] : '';
+    const explain = block.querySelector('.q-explain').value.trim();
+
+    if (!text) {
+      showToast(`سؤال ${i + 1}: يرجى كتابة نص السؤال`, 'error');
+      block.querySelector('.q-text').focus();
+      valid = false;
+      return;
+    }
+    
+    const filledChoices = choices.filter(c => c);
+    if (filledChoices.length < 2) {
+      showToast(`سؤال ${i + 1}: يرجى إدخال خيارين على الأقل`, 'error');
+      valid = false;
+      return;
+    }
+
+    if (!correctText && correctIndex === -1) {
+      showToast(`سؤال ${i + 1}: يرجى تحديد الإجابة الصحيحة بالضغط على ✓`, 'error');
+      valid = false;
+      return;
+    }
+
+    questions.push({
+      number: i + 1,
+      text,
+      choices: { أ: choices[0], ب: choices[1], ج: choices[2], د: choices[3] },
+      correctAnswer: correctText || choices[correctIndex],
+      explanation: explain
     });
+  });
+
+  return valid ? questions : null;
+}
+
+function submitQuestions() {
+  const btn = document.getElementById('questionsSubmitBtn');
+  let payload;
+
+  if (activeQTab === 'manual') {
+    const questions = collectQuestions();
+    if (!questions) return;
+    payload = { type: 'questions_manual', questions, mode: 'manual' };
+  } else {
+    const text = document.getElementById('pasteText').value.trim();
+    if (!text) {
+      showToast('يرجى لصق نص الأسئلة', 'error');
+      return;
+    }
+    payload = { type: 'questions_paste', rawText: text, mode: 'paste' };
+  }
+
+  // Immediate feedback
+  btn.innerHTML = '<div class="spinner"></div> جاري الإرسال...';
+  btn.disabled = true;
+
+  const rowId = currentQuestion.id;
+  const fullPayload = {
+    ...payload,
+    id: currentQuestion.id,
+    subject: currentQuestion.subject,
+    lecture: currentQuestion.lecture
   };
+
+  // Close modal immediately - background submit
+  closeModal('questionsModal');
+  showToast('⏳ جاري إرسال الأسئلة في الخلفية...', 'info', 5000);
+  markRowStatus(rowId, 'uploading');
+
+  fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify(fullPayload)
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.logs) data.logs.forEach(l => log(l));
+    if (data.status === 'error') {
+      markRowStatus(rowId, 'failed');
+      showToast('فشل إرسال الأسئلة: ' + data.message, 'error', 6000);
+    } else {
+      showToast('✅ تم إرسال الأسئلة بنجاح!', 'success');
+      removeRow(rowId);
+    }
+  })
+  .catch(err => {
+    log('QUESTIONS FETCH ERROR: ' + err, 'error');
+    markRowStatus(rowId, 'failed');
+    showToast('فشل الاتصال بالسيرفر', 'error');
+  });
+}
 </script>
 </body>
 </html>
