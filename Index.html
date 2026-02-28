@@ -1150,60 +1150,39 @@ function hideProgress(delay = 2500) {
   }, delay);
 }
 
-// ── Chunked upload engine ─────────────────────────────────────────────────
-const CHUNK_SIZE_BYTES = 180 * 1024; // 180 KB per chunk (safe for Apps Script 200KB limit)
+// ── Single-shot direct upload (compress → one request → done) ────────────
+async function uploadFile(fileObj, meta) {
+  log(`Uploading: ${fileObj.name} (${(fileObj.data.length * 0.75 / 1024).toFixed(0)} KB)`);
 
-async function uploadFileInChunks(fileObj, meta) {
-  // fileObj = { name, mimeType, data: base64string }
-  const totalLen = fileObj.data.length;
-  const totalChunks = Math.ceil(totalLen / CHUNK_SIZE_BYTES);
-  const uploadId = Date.now().toString(36) + Math.random().toString(36).slice(2);
-
-  log(`Starting chunked upload: ${fileObj.name}, ${totalChunks} chunks, uploadId=${uploadId}`);
-
-  for (let i = 0; i < totalChunks; i++) {
-    const start = i * CHUNK_SIZE_BYTES;
-    const end = Math.min(start + CHUNK_SIZE_BYTES, totalLen);
-    const chunkData = fileObj.data.slice(start, end);
-
-    const payload = {
-      type: 'file_chunk',
-      uploadId,
-      chunkIndex: i,
-      totalChunks,
-      id: meta.id,
-      subject: meta.subject,
-      fileName: fileObj.name,
-      mimeType: fileObj.mimeType,
-      chunkData,
-      isFinalChunk: (i === totalChunks - 1),
-      // Only send meta on last chunk so server can finalize
-    };
-
-    const pct = Math.round(((i + 1) / totalChunks) * 100);
-    setProgress(pct, `جزء ${i + 1} من ${totalChunks}`);
-    log(`Sending chunk ${i+1}/${totalChunks} (${(chunkData.length/1024).toFixed(1)}KB)`);
-
-    let attempts = 0;
-    let success = false;
-    while (attempts < 3 && !success) {
-      attempts++;
-      try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        if (data.logs) data.logs.forEach(l => log(l));
-        if (data.status === 'error') throw new Error(data.message);
-        success = true;
-        log(`Chunk ${i+1} OK`);
-      } catch(err) {
-        log(`Chunk ${i+1} attempt ${attempts} failed: ${err}`, 'error');
-        if (attempts >= 3) throw new Error(`فشل رفع الجزء ${i+1} بعد 3 محاولات: ${err.message}`);
-        await new Promise(r => setTimeout(r, 1000 * attempts)); // backoff
-      }
+  // Animate a fake-but-smooth progress bar while the single request is in flight.
+  // Real XHR progress events don't work with Google Apps Script (no streaming),
+  // so we simulate a curve that reaches ~90% then snaps to 100% on success.
+  let fakePct = 5;
+  const fakeTimer = setInterval(() => {
+    if (fakePct < 88) {
+      fakePct += fakePct < 30 ? 5 : fakePct < 60 ? 2 : 0.4;
+      setProgress(Math.round(fakePct));
     }
+  }, 250);
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'file_direct',
+        id: meta.id,
+        subject: meta.subject,
+        fileName: fileObj.name,
+        mimeType: fileObj.mimeType,
+        fileData: fileObj.data,
+      }),
+    });
+    const data = await res.json();
+    if (data.logs) data.logs.forEach(l => log(l));
+    if (data.status === 'error') throw new Error(data.message);
+    log(`Upload OK: ${fileObj.name}`);
+  } finally {
+    clearInterval(fakeTimer);
   }
 }
 
@@ -1296,9 +1275,9 @@ async function submitUpload() {
         reader.readAsDataURL(processedFile);
       });
 
-      // 3. Upload in chunks
-      document.getElementById('progress-title-text').textContent = `رفع ${i+1}/${currentUpload.files.length}: ${rawFile.name}`;
-      await uploadFileInChunks(
+      // 3. Upload — single request
+      document.getElementById('progress-title-text').textContent = `جاري رفع: ${rawFile.name}`;
+      await uploadFile(
         { name: rawFile.name, mimeType: processedFile.type || rawFile.type, data: base64 },
         meta
       );
