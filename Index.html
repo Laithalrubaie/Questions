@@ -553,6 +553,116 @@
     .status-done { background: var(--success-bg); color: var(--success); }
     .status-failed { background: var(--danger-bg); color: var(--danger); }
 
+    /* ===== GLOBAL UPLOAD PROGRESS OVERLAY ===== */
+    #upload-progress-overlay {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      left: 24px;
+      max-width: 420px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+      z-index: 3000;
+      padding: 20px 22px;
+      border: 1.5px solid var(--border);
+      animation: slideUpPanel 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    #upload-progress-overlay.visible { display: block; }
+    @keyframes slideUpPanel {
+      from { transform: translateY(30px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .progress-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .progress-title {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .progress-pct {
+      font-weight: 900;
+      font-size: 1rem;
+      color: var(--primary);
+      min-width: 42px;
+      text-align: left;
+    }
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #60a5fa);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+      width: 0%;
+      position: relative;
+    }
+    .progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer {
+      0%   { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
+    }
+    .progress-bar.done {
+      background: var(--success);
+    }
+    .progress-bar.done::after { display: none; }
+    .progress-info {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+    .progress-file-name {
+      font-weight: 600;
+      color: #374151;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 200px;
+    }
+    /* Warn banner when user tries to leave */
+    #leave-warning-banner {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #dc2626;
+      color: white;
+      text-align: center;
+      padding: 14px 20px;
+      font-family: "Cairo";
+      font-weight: 800;
+      font-size: 0.95rem;
+      z-index: 4000;
+      animation: dropDown 0.3s ease forwards;
+      line-height: 1.5;
+    }
+    #leave-warning-banner.visible { display: block; }
+    @keyframes dropDown {
+      from { transform: translateY(-100%); }
+      to   { transform: translateY(0); }
+    }
+
     /* ===== TOAST ===== */
     #toast-container {
       position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
@@ -724,6 +834,29 @@
         <span>📤</span> إرسال الأسئلة
       </button>
     </div>
+  </div>
+</div>
+
+<!-- ========== LEAVE WARNING ========== -->
+<div id="leave-warning-banner">
+  ⚠️ لا تغلق الصفحة! جاري رفع الملف الآن... انتظر حتى يكتمل
+</div>
+
+<!-- ========== UPLOAD PROGRESS PANEL ========== -->
+<div id="upload-progress-overlay">
+  <div class="progress-header">
+    <div class="progress-title">
+      <span id="progress-icon">☁️</span>
+      <span id="progress-title-text">جاري رفع الملف...</span>
+    </div>
+    <span class="progress-pct" id="progress-pct-text">0%</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-bar" id="progress-bar-fill"></div>
+  </div>
+  <div class="progress-info">
+    <span class="progress-file-name" id="progress-file-name">...</span>
+    <span id="progress-chunk-info"></span>
   </div>
 </div>
 
@@ -919,8 +1052,33 @@ function filterLectures(subject, query) {
 // =========================================================================
 // UPLOAD MODAL
 // =========================================================================
+
+// Track active uploads to prevent tab/window close mid-upload
+let activeUploads = 0;
+
+function setUploadActive(isActive) {
+  if (isActive) {
+    activeUploads++;
+    document.getElementById('leave-warning-banner').classList.add('visible');
+  } else {
+    activeUploads = Math.max(0, activeUploads - 1);
+    if (activeUploads === 0) {
+      document.getElementById('leave-warning-banner').classList.remove('visible');
+    }
+  }
+}
+
+// Warn browser if user tries to close/navigate while uploading
+window.addEventListener('beforeunload', (e) => {
+  if (activeUploads > 0) {
+    e.preventDefault();
+    e.returnValue = 'جاري رفع ملف الآن. هل أنت متأكد أنك تريد المغادرة؟';
+    return e.returnValue;
+  }
+});
+
 function openUploadModal(id, subject, title) {
-  currentUpload = { id, subject, files: [] };
+  currentUpload = { id, subject, files: [], rawFiles: [] };
   document.getElementById('uploadModalSubtitle').textContent = `المحاضرة: ${title}`;
   document.getElementById('fileList').innerHTML = '';
   document.getElementById('fileInput').value = '';
@@ -933,31 +1091,163 @@ function closeModal(id) {
   document.getElementById(id).classList.remove('open');
 }
 
+// ── Image compression ─────────────────────────────────────────────────────
+function compressImage(file, maxWidthPx = 1600, quality = 0.82) {
+  return new Promise((resolve) => {
+    // Only compress images; pass everything else through unchanged
+    if (!file.type.startsWith('image/')) { resolve(file); return; }
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if (width > maxWidthPx) {
+        height = Math.round(height * maxWidthPx / width);
+        width = maxWidthPx;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => {
+        const compressed = new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() });
+        log(`Compressed ${file.name}: ${(file.size/1024).toFixed(0)}KB → ${(compressed.size/1024).toFixed(0)}KB`);
+        resolve(compressed);
+      }, 'image/jpeg', quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+
+// ── Progress panel helpers ────────────────────────────────────────────────
+function showProgress(fileName) {
+  const overlay = document.getElementById('upload-progress-overlay');
+  overlay.classList.add('visible');
+  document.getElementById('progress-icon').textContent = '☁️';
+  document.getElementById('progress-title-text').textContent = 'جاري رفع الملف...';
+  document.getElementById('progress-file-name').textContent = fileName;
+  document.getElementById('progress-chunk-info').textContent = '';
+  setProgress(0);
+}
+
+function setProgress(pct, chunkInfo = '') {
+  const fill = document.getElementById('progress-bar-fill');
+  const pctEl = document.getElementById('progress-pct-text');
+  fill.style.width = pct + '%';
+  pctEl.textContent = pct + '%';
+  if (chunkInfo) document.getElementById('progress-chunk-info').textContent = chunkInfo;
+  if (pct >= 100) {
+    fill.classList.add('done');
+    document.getElementById('progress-icon').textContent = '✅';
+    document.getElementById('progress-title-text').textContent = 'اكتمل الرفع!';
+  }
+}
+
+function hideProgress(delay = 2500) {
+  setTimeout(() => {
+    document.getElementById('upload-progress-overlay').classList.remove('visible');
+    document.getElementById('progress-bar-fill').classList.remove('done');
+  }, delay);
+}
+
+// ── Chunked upload engine ─────────────────────────────────────────────────
+const CHUNK_SIZE_BYTES = 180 * 1024; // 180 KB per chunk (safe for Apps Script 200KB limit)
+
+async function uploadFileInChunks(fileObj, meta) {
+  // fileObj = { name, mimeType, data: base64string }
+  const totalLen = fileObj.data.length;
+  const totalChunks = Math.ceil(totalLen / CHUNK_SIZE_BYTES);
+  const uploadId = Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+  log(`Starting chunked upload: ${fileObj.name}, ${totalChunks} chunks, uploadId=${uploadId}`);
+
+  for (let i = 0; i < totalChunks; i++) {
+    const start = i * CHUNK_SIZE_BYTES;
+    const end = Math.min(start + CHUNK_SIZE_BYTES, totalLen);
+    const chunkData = fileObj.data.slice(start, end);
+
+    const payload = {
+      type: 'file_chunk',
+      uploadId,
+      chunkIndex: i,
+      totalChunks,
+      id: meta.id,
+      subject: meta.subject,
+      fileName: fileObj.name,
+      mimeType: fileObj.mimeType,
+      chunkData,
+      isFinalChunk: (i === totalChunks - 1),
+      // Only send meta on last chunk so server can finalize
+    };
+
+    const pct = Math.round(((i + 1) / totalChunks) * 100);
+    setProgress(pct, `جزء ${i + 1} من ${totalChunks}`);
+    log(`Sending chunk ${i+1}/${totalChunks} (${(chunkData.length/1024).toFixed(1)}KB)`);
+
+    let attempts = 0;
+    let success = false;
+    while (attempts < 3 && !success) {
+      attempts++;
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (data.logs) data.logs.forEach(l => log(l));
+        if (data.status === 'error') throw new Error(data.message);
+        success = true;
+        log(`Chunk ${i+1} OK`);
+      } catch(err) {
+        log(`Chunk ${i+1} attempt ${attempts} failed: ${err}`, 'error');
+        if (attempts >= 3) throw new Error(`فشل رفع الجزء ${i+1} بعد 3 محاولات: ${err.message}`);
+        await new Promise(r => setTimeout(r, 1000 * attempts)); // backoff
+      }
+    }
+  }
+}
+
+// ── File select ───────────────────────────────────────────────────────────
 function handleFileSelect(input) {
   const list = document.getElementById('fileList');
   list.innerHTML = '';
   currentUpload.files = [];
-  
-  Array.from(input.files).forEach(file => {
-    const reader = new FileReader();
+  currentUpload.rawFiles = Array.from(input.files);
+
+  currentUpload.rawFiles.forEach(file => {
     const fileId = Date.now().toString() + Math.random().toString(16).slice(2);
-    
-    reader.onload = (e) => {
-      const dataUrl = e.target.result;
-      const base64 = dataUrl.split(',')[1];
-      currentUpload.files.push({ id: fileId, name: file.name, mimeType: file.type, data: base64 });
-      
-      const item = document.createElement('div');
-      item.className = 'file-item';
-      item.dataset.fileId = fileId;
-      const isImage = file.type?.startsWith('image/');
+    const isImage = file.type?.startsWith('image/');
+    const sizeKB = (file.size / 1024).toFixed(0);
+
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    item.dataset.fileId = fileId;
+
+    if (isImage) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        item.innerHTML = `
+          <img src="${e.target.result}" alt="${file.name}" class="file-thumb">
+          <div style="flex:1; overflow:hidden;">
+            <div class="file-name">${file.name}</div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">${sizeKB}KB ${isImage ? '· سيتم ضغط الصورة تلقائياً 🗜️' : ''}</div>
+          </div>
+          <button type="button" class="file-remove-btn" onclick="removeFile('${fileId}', this)">🗑️ حذف</button>`;
+      };
+      reader.readAsDataURL(file);
+    } else {
       item.innerHTML = `
-        ${isImage ? `<img src="${dataUrl}" alt="${file.name}" class="file-thumb">` : `<span class="file-icon">📄</span>`}
-        <span class="file-name">${file.name}</span>
+        <span class="file-icon">📄</span>
+        <div style="flex:1; overflow:hidden;">
+          <div class="file-name">${file.name}</div>
+          <div style="font-size:0.75rem; color:var(--text-muted);">${sizeKB}KB</div>
+        </div>
         <button type="button" class="file-remove-btn" onclick="removeFile('${fileId}', this)">🗑️ حذف</button>`;
-      list.appendChild(item);
-    };
-    reader.readAsDataURL(file);
+    }
+    item.dataset.fileName = file.name;
+    list.appendChild(item);
+    // keep raw file reference
+    currentUpload.files.push({ id: fileId, rawFile: file });
   });
 }
 
@@ -966,50 +1256,69 @@ function removeFile(fileId, btn) {
   btn.closest('.file-item')?.remove();
 }
 
-function submitUpload() {
+// ── Submit ────────────────────────────────────────────────────────────────
+async function submitUpload() {
   const btn = document.getElementById('uploadSubmitBtn');
-  if (currentUpload.files.length === 0) {
+  if (!currentUpload.files || currentUpload.files.length === 0) {
     showToast('يرجى اختيار ملف واحد على الأقل', 'error');
     return;
   }
 
-  // INSTANT UI FEEDBACK - mark as uploaded immediately
-  btn.innerHTML = '<div class="spinner"></div> جاري الرفع...';
+  btn.innerHTML = '<div class="spinner"></div> جاري التحضير...';
   btn.disabled = true;
 
   const rowId = currentUpload.id;
-  const uploadData = { ...currentUpload };
+  const meta = { id: currentUpload.id, subject: currentUpload.subject };
 
-  // Close modal immediately
+  // Close modal right away
   closeModal('uploadModal');
-  showToast('⏳ جاري الرفع في الخلفية... يمكنك المتابعة', 'info', 5000);
-
-  // Mark row as "uploading" visually
   markRowStatus(rowId, 'uploading');
+  setUploadActive(true);
 
-  // Do the upload in background - user doesn't wait
-  fetch(API_URL, {
-    method: 'POST',
-    body: JSON.stringify({ ...uploadData, type: 'file' })
-  })
-  .then(r => r.json())
-  .then(data => {
-    if (data.logs) data.logs.forEach(l => log(l));
-    if (data.status === 'error') {
-      markRowStatus(rowId, 'failed', data.message);
-      showToast('فشل الرفع: ' + data.message, 'error', 6000);
-      log('UPLOAD ERROR: ' + data.message, 'error');
-    } else {
-      showToast('✅ تم رفع الملف بنجاح!', 'success');
-      log('Upload success for ' + rowId);
-      removeRow(rowId);
+  try {
+    for (let i = 0; i < currentUpload.files.length; i++) {
+      const fileEntry = currentUpload.files[i];
+      const rawFile = fileEntry.rawFile;
+
+      // 1. Compress if image
+      showProgress(rawFile.name);
+      document.getElementById('progress-title-text').textContent = rawFile.type.startsWith('image/') 
+        ? 'جاري ضغط الصورة...' : 'جاري تحضير الملف...';
+      setProgress(0);
+
+      const processedFile = await compressImage(rawFile);
+
+      // 2. Read as base64
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(processedFile);
+      });
+
+      // 3. Upload in chunks
+      document.getElementById('progress-title-text').textContent = `رفع ${i+1}/${currentUpload.files.length}: ${rawFile.name}`;
+      await uploadFileInChunks(
+        { name: rawFile.name, mimeType: processedFile.type || rawFile.type, data: base64 },
+        meta
+      );
     }
-  })
-  .catch(err => {
-    log('UPLOAD FETCH ERROR: ' + err, 'error');
-    markRowStatus(rowId, 'failed', 'فشل الاتصال');
-    showToast('فشل الاتصال بالسيرفر', 'error');
-  });
+
+    // All files done
+    setProgress(100);
+    setUploadActive(false);
+    hideProgress(2200);
+    showToast('✅ تم رفع الملف بنجاح!', 'success');
+    log('All files uploaded successfully for ' + rowId);
+    removeRow(rowId);
+
+  } catch (err) {
+    setUploadActive(false);
+    hideProgress(500);
+    log('UPLOAD FAILED: ' + err, 'error');
+    markRowStatus(rowId, 'failed');
+    showToast('❌ فشل الرفع: ' + err.message, 'error', 8000);
+  }
 }
 
 function markRowStatus(rowId, status, msg) {
